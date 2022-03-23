@@ -17,7 +17,47 @@ const MenuLayout = () => {
     }
 
     const menuUser = (
-        <Menu>
+        <Menu
+            style={{
+                width: 200
+            }}
+        >
+            <Row
+                style={{
+                    display: 'flex',
+                    alignItem: 'center',
+                    justifyContent: 'center',
+                    padding: 10,
+                    borderBottom: '1px solid #999'
+                }}
+            >
+                <Col span={6}>
+                    <div
+                        style={{
+                            width: 25,
+                            height: 25,
+                            margin: 'auto',
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translateY(-50%) translateX(-50%)'
+                        }}
+                    >
+                        <img src='https://crm-v2-dev.247post.vn/images/avatar.png' style={{
+                            width: '100%',
+                            height: '100%',
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translateY(-50%) translateX(-50%)'
+                        }} />
+                    </div>
+                </Col>
+                <Col span={18}>
+                    <span>Duc Hieu</span>
+                    <p style={{ marginBottom: 0 }}>hieu@gmail.com</p>
+                </Col>
+            </Row>
             <Menu.Item>
                 Profile
             </Menu.Item>
@@ -29,13 +69,13 @@ const MenuLayout = () => {
 
     return (
         <div>
-            <Menu mode="horizontal" style={{ backgroundColor: '#17A589', color: '#fff' }}>
+            <Menu mode="horizontal" style={{ height: 46 }}>
                 <Row
                     style={{
                         width: '100%'
                     }}
                 >
-                    <Col span={2}>
+                    {/* <Col span={2}>
                         <Menu.Item key="logo" style={{ color: '#fff' }}>
                             <div
                                 style={{
@@ -55,8 +95,8 @@ const MenuLayout = () => {
                                 <span>Joinco</span>
                             </div>
                         </Menu.Item>
-                    </Col>
-                    <Col span={2}>
+                    </Col> */}
+                    {/* <Col span={2}>
                         <Menu.SubMenu
                             key="workspace"
                             title="Workspaces"
@@ -65,23 +105,25 @@ const MenuLayout = () => {
                             <Menu.Item key="1" >workspace1</Menu.Item>
                             <Menu.Item key="2" >workspace2</Menu.Item>
                         </Menu.SubMenu>
-                    </Col>
-                    <Col span={2}>
-                        <Menu.Item key="create">
-                            <Button type="primary" style={{ backgroundColor: '#117A65', borderColor: '#117A65' }}>Create</Button>
-                        </Menu.Item>
-                    </Col>
-                    <Col span={12}></Col>
-                    <Col span={4}>
+                    </Col> */}
+                    <Col span={8}>
                         <Input.Search
                             style={{
                                 position: 'absolute',
                                 top: '50%',
-                                transform: 'translateY(-50%)'
+                                transform: 'translateY(-50%)',
+                                marginLeft: 10
                             }}
                         />
                     </Col>
-                    <Col span={1} style={{ textAlign: 'center' }}>
+                    <Col span={14}></Col>
+                    {/* <Col span={4} style={{ textAlign: 'center' }}>
+                        <Menu.Item key="create">
+                            <Button type="primary">Create Workspace</Button>
+                        </Menu.Item>
+                    </Col> */}
+
+                    <Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
                         <BellOutlined
                             style={{
                                 fontSize: 20,

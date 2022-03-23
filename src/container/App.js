@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import AppContainer from 'components/layout/AppContainer';
-import { Row  } from 'antd';
+import { Row } from 'antd';
 import Login from 'pages/login/Login';
+import Registration from 'pages/registation/Registration';
 
 const App = () => {
 
@@ -16,6 +17,9 @@ const App = () => {
                 <Route path="/">
                     <AppContainer />
                 </Route>
+                {/* <Route path="/registration">
+                    <Registration />
+                </Route> */}
             </Switch>
         </Router>
     );

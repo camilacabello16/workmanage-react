@@ -7,7 +7,9 @@ import LoadingSpinner from 'components/shared/LoadingSpinner';
 import Login from '../../pages/login/Login';
 import { useEffect } from 'react';
 import MenuLayout from './MenuLayout';
-import { Menu } from 'antd';
+import { Menu, Row, Col } from 'antd';
+import LeftMenuLayout from './LeftMenuLayout';
+import Registration from 'pages/registation/Registration';
 
 const Home = lazy(() => import('components/home/Home'));
 const CustomHome = lazy(() => import('components/home/CustomHome'));
@@ -23,25 +25,39 @@ function AppContainer() {
             //   }
             //window.location.href = '/';
         } else {
-            window.location.href = '/login';
+            if (!window.localStorage.getItem('isSignUp')) {
+                window.location.href = '/login';
+            }
+            window.localStorage.removeItem('iSignUp')
         }
     }, [])
 
     return (
         <Router>
             <ErrorBoundary>
-                <MenuLayout />
-                <Suspense fallback={<LoadingSpinner />}>
-                    <Switch>
-                        <Route path="/custom-home">
-                            <CustomHome />
-                        </Route>
-                        <Route exact path="/home">
-                            <Home />
-                        </Route>
+                <Switch>
+                    <Route path="/registration">
+                        <Registration />
+                    </Route>
+                    <Row>
+                        <Col span={4}>
+                            <LeftMenuLayout />
+                        </Col>
+                        <Col span={20}>
+                            <MenuLayout />
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <Route path="/custom-home">
+                                    <CustomHome />
+                                </Route>
+                                <Route exact path="/home">
+                                    <Home />
+                                </Route>
 
-                    </Switch>
-                </Suspense>
+                            </Suspense>
+                        </Col>
+                    </Row>
+                </Switch>
+
             </ErrorBoundary>
         </Router>
     );

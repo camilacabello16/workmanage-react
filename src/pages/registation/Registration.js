@@ -7,12 +7,11 @@ import {
     Card,
     Button,
     notification,
-    Space,
-    Image
+    Space
 } from 'antd';
 import { Link } from 'react-router-dom';
 
-const Login = () => {
+const Registration = () => {
     const openNotificationWithIcon = (type, message, description) => {
         notification[type]({
             message: message,
@@ -23,8 +22,8 @@ const Login = () => {
     const onFinish = (values) => {
         console.log(values);
         window.localStorage.setItem('user', JSON.stringify(values));
-        openNotificationWithIcon("success", "Login success")
-        window.location.href = "/home";
+        openNotificationWithIcon("success", "Registration success")
+        window.location.href = "/login";
     };
 
     return (
@@ -109,6 +108,29 @@ const Login = () => {
                         />
                     </Form.Item>
                     <Form.Item
+                        name="name"
+                        rules={[
+                            { required: true, message: 'Display name is required' }
+                        ]}
+                    >
+                        <Input
+                            style={{ width: '100%', padding: 8 }}
+                            placeholder="Display Name"
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        name="email"
+                        rules={[
+                            { required: true, message: 'Email is required' },
+                            { type: 'email' }
+                        ]}
+                    >
+                        <Input
+                            style={{ width: '100%', padding: 8 }}
+                            placeholder="Email"
+                        />
+                    </Form.Item>
+                    <Form.Item
                         name="password"
                         rules={[
                             { required: true, message: 'Password is required' }
@@ -117,7 +139,26 @@ const Login = () => {
                     >
                         <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Password" />
                     </Form.Item>
-                    <p>Don't have an account yet? <Link to={"/registration"} onClick={() => window.localStorage.setItem('isSignUp', true)}>Sign up</Link></p>
+                    <Form.Item
+                        name="confirmPassword"
+                        dependencies={['password']}
+                        hasFeedback
+                        rules={[
+                            { required: true, message: 'Confirm password is required' },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                                },
+                            }),
+                        ]}
+                        style={{ marginTop: 10 }}
+                    >
+                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Confirm password" />
+                    </Form.Item>
+                    <p>Already have an account? <Link onClick={() => window.location.href = '/login'} >Log in</Link></p>
                     <Button
                         type='primary'
                         htmlType='submit'
@@ -127,11 +168,11 @@ const Login = () => {
                             // borderColor: '#17A589',
                             height: 40
                         }}
-                    >Log In</Button>
+                    >Sign Up</Button>
                 </Form>
             </Card>
         </div>
     );
 }
 
-export default Login;
+export default Registration;
