@@ -1,0 +1,1 @@
+export default PRIMARY_COLOR = '#17A589';
