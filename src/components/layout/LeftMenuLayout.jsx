@@ -3,15 +3,16 @@ import { Menu, Button } from 'antd';
 import 'antd/dist/antd.css';
 import {
     PieChartOutlined,
-    UnorderedListOutlined
-} from '@ant-design/icons'
+    UnorderedListOutlined,
+    MenuOutlined
+} from '@ant-design/icons';
 
 const { SubMenu } = Menu;
 
 const LeftMenuLayout = () => {
     return (
         <Menu
-            defaultSelectedKeys={['1']}
+            defaultSelectedKeys={['5']}
             defaultOpenKeys={['sub1']}
             mode="inline"
             style={{
@@ -51,6 +52,8 @@ const LeftMenuLayout = () => {
                 <Menu.Item key="6">Option 6</Menu.Item>
                 <Menu.Item key="7">Option 7</Menu.Item>
                 <Menu.Item key="8">Option 8</Menu.Item>
+            </SubMenu>
+            <SubMenu key="sub2" icon={<MenuOutlined />} title="My Workspaces">
             </SubMenu>
         </Menu>
     );

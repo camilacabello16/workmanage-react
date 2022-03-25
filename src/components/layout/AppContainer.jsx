@@ -50,7 +50,7 @@ function AppContainer() {
                                 <Route path="/custom-home">
                                     <CustomHome />
                                 </Route>
-                                <Route exact path="/home">
+                                <Route exact path="/">
                                     <Home />
                                 </Route>
                                 <Route exact path="/board">
