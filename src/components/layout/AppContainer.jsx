@@ -10,6 +10,7 @@ import MenuLayout from './MenuLayout';
 import { Menu, Row, Col } from 'antd';
 import LeftMenuLayout from './LeftMenuLayout';
 import Registration from 'pages/registation/Registration';
+import BoardDetail from 'pages/board/BoardDetail';
 
 const Home = lazy(() => import('components/home/Home'));
 const CustomHome = lazy(() => import('components/home/CustomHome'));
@@ -52,7 +53,9 @@ function AppContainer() {
                                 <Route exact path="/home">
                                     <Home />
                                 </Route>
-
+                                <Route exact path="/board">
+                                    <BoardDetail />
+                                </Route>
                             </Suspense>
                         </Col>
                     </Row>
