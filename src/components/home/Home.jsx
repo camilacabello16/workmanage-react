@@ -9,20 +9,26 @@ import {
     Tabs,
     Card,
     Table,
-    Tooltip
+    Tooltip,
+    Modal,
+    Select
 } from 'antd';
 import LeftMenuLayout from 'components/layout/LeftMenuLayout';
 import {
     PlusOutlined,
     EditOutlined,
     DeleteOutlined,
-    EyeOutlined
+    EyeOutlined,
+    UserAddOutlined
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import 'antd/dist/antd.less';
+import FormWorkspace from '../../pages/workspace/FormWorkspace';
+import FormBoard from 'pages/board/FormBoard';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
+const { Option } = Select;
 
 function Home() {
     const history = useHistory();
@@ -37,6 +43,21 @@ function Home() {
             createdBy: 'Hieu'
         }
     ]);
+    const [isVisible, setIsVisible] = useState(false);
+    const [visibleBoardModal, setVisibleBoardModal] = useState(false);
+    const [visibleModalInvite, setVisibleModalInvite] = useState(false);
+
+    const openFormWorkspace = () => {
+        setIsVisible(true);
+    }
+
+    const openBoardModal = () => {
+        setVisibleBoardModal(true);
+    }
+
+    const openModalInvite = () => {
+        setVisibleModalInvite(true);
+    }
 
     const columnBoard = [
         {
@@ -75,11 +96,18 @@ function Home() {
             render: () => {
                 return (
                     <span>
-                        <Tooltip title="Chi tiết">
+                        <Tooltip title="Detail">
                             <EyeOutlined
                                 className="icon_action"
                                 style={{ color: "#28a745", fontSize: 18 }}
                                 onClick={() => history.push('/board')}
+                            />
+                        </Tooltip>
+                        <Tooltip title="Invite">
+                            <UserAddOutlined
+                                className="icon_action"
+                                style={{ color: "#F1C40F", fontSize: 18 }}
+                                onClick={openModalInvite}
                             />
                         </Tooltip>
                         <Tooltip
@@ -111,6 +139,7 @@ function Home() {
                 extra={[
                     <Button
                         type="primary"
+                        onClick={openFormWorkspace}
                     >Create</Button>,
                     <Button type="primary">Edit</Button>,
                     <Button type="primary">Delete</Button>
@@ -129,7 +158,7 @@ function Home() {
                                 <Row>
                                     <Col span={20}></Col>
                                     <Col span={4} style={{ textAlign: 'right' }}>
-                                        <Button type='primary'>Create Board</Button>
+                                        <Button type='primary' onClick={openBoardModal}>Create Board</Button>
                                     </Col>
                                 </Row>
                             }
@@ -148,6 +177,33 @@ function Home() {
                     </TabPane>
                 </Tabs>
             </Card>
+            <FormWorkspace
+                visible={isVisible}
+                setIsVisible={setIsVisible}
+            />
+            <FormBoard
+                visible={visibleBoardModal}
+                setVisibleBoardModal={setVisibleBoardModal}
+            />
+            <Modal
+                visible={visibleModalInvite}
+                title="Invite Members"
+                onCancel={() => setVisibleModalInvite(false)}
+            >
+                <Select
+                    showSearch
+                    optionFilterProp="children"
+                    placeholder="Select members"
+                    style={{
+                        width: '100%'
+                    }}
+                    mode="multiple"
+                    allowClear
+                >
+                    <Option>Hiếu</Option>
+                    <Option>Hiếu</Option>
+                </Select>
+            </Modal>
         </div>
     );
 }
