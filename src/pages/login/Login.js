@@ -24,7 +24,7 @@ const Login = () => {
         console.log(values);
         window.localStorage.setItem('user', JSON.stringify(values));
         openNotificationWithIcon("success", "Login success")
-        window.location.href = "/home";
+        window.location.href = "/";
     };
 
     return (

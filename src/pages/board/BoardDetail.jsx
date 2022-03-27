@@ -6,6 +6,7 @@ import {
 } from 'antd';
 import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { useHistory } from 'react-router-dom';
 
 const BoardDetail = () => {
     const [listCard, setListCard] = useState([
@@ -49,6 +50,7 @@ const BoardDetail = () => {
             name: 'test 5'
         },
     ]);
+    const history = useHistory();
 
     const onDragEnd = (result, columns, setColumns) => {
         if (!result.destination) return;
@@ -68,6 +70,7 @@ const BoardDetail = () => {
 
                         <Col span={12}></Col>
                         <Col span={6} style={{ textAlign: 'right' }}>
+                            <Button onClick={() => history.push('/')} style={{ marginRight: 10 }}>Back</Button>
                             <Button>Invite</Button>
                             <Button type='primary' style={{ marginLeft: 10 }}>Edit</Button>
                             <Button type='primary' style={{ marginLeft: 10 }}>Delete</Button>

@@ -19,7 +19,8 @@ import {
     EditOutlined,
     DeleteOutlined,
     EyeOutlined,
-    UserAddOutlined
+    UserAddOutlined,
+    UserDeleteOutlined
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import 'antd/dist/antd.less';
@@ -46,6 +47,16 @@ function Home() {
     const [isVisible, setIsVisible] = useState(false);
     const [visibleBoardModal, setVisibleBoardModal] = useState(false);
     const [visibleModalInvite, setVisibleModalInvite] = useState(false);
+
+    //user
+    const [listUser, setListUser] = useState([
+        {
+            id: 1,
+            name: 'Hiếu',
+            role: 'Dev',
+            email: 'hieu@gmail.com'
+        }
+    ])
 
     const openFormWorkspace = () => {
         setIsVisible(true);
@@ -132,6 +143,47 @@ function Home() {
         }
     ]
 
+    const columnUser = [
+        {
+            title: '#',
+            key: 'STT',
+            dataIndex: 'id',
+        },
+        {
+            title: 'Name',
+            key: 'name',
+            dataIndex: 'name',
+        },
+        {
+            title: 'Role',
+            key: 'role',
+            dataIndex: 'role',
+        },
+        {
+            title: 'Email',
+            key: 'email',
+            dataIndex: 'email',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: () => {
+                return (
+                    <span>
+                        <Tooltip
+                            title={'Remove'}
+                        >
+                            <UserDeleteOutlined
+                                className="icon_action"
+                                style={{ color: "#E74C3C", fontSize: 18 }}
+                            />
+                        </Tooltip>
+                    </span>
+                );
+            }
+        }
+    ]
+
     return (
         <div style={{ height: 'calc(100vh - 46px)' }}>
             <PageHeader
@@ -170,11 +222,25 @@ function Home() {
                         </Card>
                     </TabPane>
                     <TabPane tab="Member" key="2">
-                        Content of Tab Pane 2
+                        <Card
+                            title={
+                                <Row>
+                                    <Col span={20}></Col>
+                                    <Col span={4} style={{ textAlign: 'right' }}>
+                                        <Button type='primary' >Invite</Button>
+                                    </Col>
+                                </Row>
+                            }
+                        >
+                            <Table
+                                columns={columnUser}
+                                dataSource={listUser}
+                            />
+                        </Card>
                     </TabPane>
-                    <TabPane tab="Tab 3" key="3">
+                    {/* <TabPane tab="Tab 3" key="3">
                         Content of Tab Pane 3
-                    </TabPane>
+                    </TabPane> */}
                 </Tabs>
             </Card>
             <FormWorkspace
