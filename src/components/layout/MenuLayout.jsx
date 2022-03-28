@@ -75,37 +75,6 @@ const MenuLayout = () => {
                         width: '100%'
                     }}
                 >
-                    {/* <Col span={2}>
-                        <Menu.Item key="logo" style={{ color: '#fff' }}>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <img
-                                    src={require('../../asset/logo2.jpg')}
-                                    style={{
-                                        width: 25,
-                                        height: 25,
-                                        marginRight: 10
-                                    }}
-                                />
-                                <span>Joinco</span>
-                            </div>
-                        </Menu.Item>
-                    </Col> */}
-                    {/* <Col span={2}>
-                        <Menu.SubMenu
-                            key="workspace"
-                            title="Workspaces"
-                            style={{ color: '#fff' }}
-                        >
-                            <Menu.Item key="1" >workspace1</Menu.Item>
-                            <Menu.Item key="2" >workspace2</Menu.Item>
-                        </Menu.SubMenu>
-                    </Col> */}
                     <Col span={8}>
                         <Input.Search
                             style={{
@@ -117,12 +86,6 @@ const MenuLayout = () => {
                         />
                     </Col>
                     <Col span={14}></Col>
-                    {/* <Col span={4} style={{ textAlign: 'center' }}>
-                        <Menu.Item key="create">
-                            <Button type="primary">Create Workspace</Button>
-                        </Menu.Item>
-                    </Col> */}
-
                     <Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
                         <BellOutlined
                             style={{
