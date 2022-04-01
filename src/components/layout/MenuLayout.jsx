@@ -5,10 +5,12 @@ import {
     Button,
     Row,
     Col,
-    Dropdown
+    Dropdown,
+    Space,
+    Tooltip
 } from 'antd';
 import 'antd/dist/antd.css';
-import { BellOutlined } from '@ant-design/icons';
+import { BellOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 const MenuLayout = () => {
     const logout = () => {
@@ -65,7 +67,81 @@ const MenuLayout = () => {
                 Logout
             </Menu.Item>
         </Menu>
-    )
+    );
+
+    const notificationList = (
+        <Space style={{ width: 400 }}>
+            <Row style={{ width: '100%' }}>
+                <Col span={20}>
+                    Hiếu mời bạn vào workspace
+                </Col>
+                <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <Tooltip title="Đồng ý">
+                        <CheckCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#17A589'
+                            }}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Từ chối">
+                        <CloseCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#E74C3C'
+                            }}
+                        />
+                    </Tooltip>
+                </Col>
+            </Row>
+            <Row style={{ width: '100%' }}>
+                <Col span={20}>
+                    Hiếu mời bạn vào workspace
+                </Col>
+                <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <Tooltip title="Đồng ý">
+                        <CheckCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#17A589'
+                            }}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Từ chối">
+                        <CloseCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#E74C3C'
+                            }}
+                        />
+                    </Tooltip>
+                </Col>
+            </Row>
+            <Row style={{ width: '100%' }}>
+                <Col span={20}>
+                    Hiếu mời bạn vào workspace
+                </Col>
+                <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <Tooltip title="Đồng ý">
+                        <CheckCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#17A589'
+                            }}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Từ chối">
+                        <CloseCircleOutlined
+                            style={{
+                                fontSize: 20,
+                                color: '#E74C3C'
+                            }}
+                        />
+                    </Tooltip>
+                </Col>
+            </Row>
+        </Space >
+    );
 
     return (
         <div>
@@ -124,14 +200,16 @@ const MenuLayout = () => {
                     </Col> */}
 
                     <Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
-                        <BellOutlined
-                            style={{
-                                fontSize: 20,
-                                position: 'absolute',
-                                top: '50%',
-                                transform: 'translateY(-50%)'
-                            }}
-                        />
+                        <Dropdown overlay={notificationList} trigger={['click']}>
+                            <BellOutlined
+                                style={{
+                                    fontSize: 20,
+                                    position: 'absolute',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)'
+                                }}
+                            />
+                        </Dropdown>
                     </Col>
                     <Col span={1}>
                         <Dropdown overlay={menuUser} placement="bottomRight">
