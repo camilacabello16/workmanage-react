@@ -5,8 +5,14 @@ import {
     Space,
     Button,
     Input,
-    Select
+    Select,
+    notification
 } from 'antd';
+import {
+    ROOT_API,
+    API_WORKSPACE
+} from '../../components/constant/api';
+import axios from 'axios';
 
 const { Option } = Select;
 
@@ -18,13 +24,24 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
         align: 'left'
     };
 
+    const openNotificationWithIcon = (type, message, description) => {
+        notification[type]({
+            message: message,
+            description: description,
+        });
+    };
+
     const onClose = () => {
         setIsVisible(false);
     }
 
     const onSubmit = () => {
         form.validateFields().then((values) => {
-
+            console.log(values);
+            axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
+                openNotificationWithIcon('success', 'Create success');
+                setIsVisible(false);
+            })
         })
     }
 
@@ -78,8 +95,8 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
                         optionFilterProp="children"
                         placeholder=""
                     >
-                        <Option key={1} value={1}>Small Business</Option>
-                        <Option key={2} value={2}>Marketing</Option>
+                        <Option key={1} value={"1"}>Small Business</Option>
+                        <Option key={2} value={"2"}>Marketing</Option>
                     </Select>
                 </Form.Item>
                 <Form.Item
@@ -92,8 +109,8 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
                     <Select
                         placeholder=""
                     >
-                        <Option key={1} value={1}>Private</Option>
-                        <Option key={2} value={2}>Public</Option>
+                        <Option key={1} value={"1"}>Private</Option>
+                        <Option key={2} value={"2"}>Public</Option>
                     </Select>
                 </Form.Item>
                 {/* <Form.Item
