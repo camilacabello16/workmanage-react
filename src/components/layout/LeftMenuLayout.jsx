@@ -6,10 +6,18 @@ import {
     UnorderedListOutlined,
     MenuOutlined
 } from '@ant-design/icons';
+import {
+    API_WORKSPACE_USER_GET_BY_USER
+} from '../constant/api';
 
 const { SubMenu } = Menu;
 
 const LeftMenuLayout = () => {
+    useEffect(() => {
+        var userJSON = window.localStorage.getItem('auth_user');
+        console.log(JSON.parse(userJSON));
+    }, []);
+
     return (
         <Menu
             defaultSelectedKeys={['5']}

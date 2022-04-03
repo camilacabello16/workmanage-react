@@ -14,7 +14,9 @@ import { BellOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-des
 
 const MenuLayout = () => {
     const logout = () => {
-        window.localStorage.removeItem('user');
+        window.localStorage.removeItem('auth_user');
+        window.localStorage.removeItem('token_expire_time');
+        window.localStorage.removeItem('jwt_token');
         window.location.href = '/login';
     }
 

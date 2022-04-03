@@ -11,6 +11,16 @@ import {
     Image
 } from 'antd';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { API_ENPOINT } from 'components/constant/api';
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+const config = {
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic Y29yZV9jbGllbnQ6c2VjcmV0'
+    }
+}
 
 const Login = () => {
     const openNotificationWithIcon = (type, message, description) => {
@@ -20,11 +30,60 @@ const Login = () => {
         });
     };
 
-    const onFinish = (values) => {
-        console.log(values);
-        window.localStorage.setItem('user', JSON.stringify(values));
-        openNotificationWithIcon("success", "Login success")
-        window.location.href = "/";
+    const onFinish = async (values) => {
+        let requestBody = 'client_id=core_client&grant_type=password&client_secret=secret';
+        requestBody = requestBody + '&username=' + values.userName + '&password=' + values.password;
+        const res = await axios.post(API_ENPOINT + '/oauth/token', requestBody, config).then(response => {
+            console.log(response);
+            var dateObj = new Date(Date.now() + response.data.expires_in * 1000);
+            window.localStorage.setItem("token_expire_time", dateObj);
+            setSession(response.data.access_token);
+        }).catch(err => {
+            console.log(err);
+            openNotificationWithIcon("error", "Username or password wrong");
+        });
+        //alert('Here')
+        await getCurrentUser().then(res => {
+            console.log(res);
+            setLoginUser(res.data);
+        });
+
+        await getAllMenuItemByRoleList().then(res => {
+            //window.localStorage.setSessionItem("navigations",res.data);
+            //window.localStorage.setLocalStorageItem("navigations", res.data);
+            openNotificationWithIcon("success", "Login success");
+            window.location.href = "/";
+        });
+
+        //window.localStorage.setItem('user', JSON.stringify(values));
+        // openNotificationWithIcon("success", "Login success")
+        // window.location.href = "/";
+    };
+
+    const getAllMenuItemByRoleList = async () => {
+        var url = API_ENPOINT + "/api/menuitem/getmenubyuser";
+        return axios.get(url);
+    };
+
+    const setLoginUser = async (user) => {
+        window.localStorage.setItem("auth_user", JSON.stringify(user));
+        return user;
+    }
+
+    const getCurrentUser = async () => {
+        let url = API_ENPOINT + "/api/users/getCurrentUser";
+        return await axios.get(url);
+    };
+
+    const setSession = (token) => {
+        if (token) {
+            window.localStorage.setItem("jwt_token", token);
+            cookies.set("jwt_token", token, { path: '/' });
+            axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+        } else {
+            window.localStorage.removeItem('jwt_token');
+            //delete axios.defaults.headers.common["Authorization"];
+        }
     };
 
     return (
