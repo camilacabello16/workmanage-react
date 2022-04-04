@@ -26,6 +26,12 @@ import { useState, useEffect } from 'react';
 import 'antd/dist/antd.less';
 import FormWorkspace from '../../pages/workspace/FormWorkspace';
 import FormBoard from 'pages/board/FormBoard';
+import {
+    API_WORKSPACE,
+    API_WORKSPACE_USER_GET_BY_USER,
+    ROOT_API
+} from '../constant/api';
+import axios from 'axios';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
@@ -47,7 +53,6 @@ function Home() {
     const [isVisible, setIsVisible] = useState(false);
     const [visibleBoardModal, setVisibleBoardModal] = useState(false);
     const [visibleModalInvite, setVisibleModalInvite] = useState(false);
-
     //user
     const [listUser, setListUser] = useState([
         {
@@ -56,7 +61,14 @@ function Home() {
             role: 'Dev',
             email: 'hieu@gmail.com'
         }
-    ])
+    ]);
+
+    useEffect(() => {
+        let userId = JSON.parse(window.localStorage.getItem('auth_user')).id;
+        axios.get(ROOT_API + API_WORKSPACE_USER_GET_BY_USER + '/' + userId).then(res => {
+            console.log(res);
+        })
+    }, [])
 
     const openFormWorkspace = () => {
         setIsVisible(true);
@@ -68,6 +80,19 @@ function Home() {
 
     const openModalInvite = () => {
         setVisibleModalInvite(true);
+    }
+
+    const removeUser = () => {
+        Modal.confirm({
+            title: "Do you want remove this member?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk() {
+                console.log("Ok");
+            },
+            onCancel() { },
+        });
     }
 
     const columnBoard = [
@@ -176,6 +201,7 @@ function Home() {
                             <UserDeleteOutlined
                                 className="icon_action"
                                 style={{ color: "#E74C3C", fontSize: 18 }}
+                                onClick={() => removeUser()}
                             />
                         </Tooltip>
                     </span>
