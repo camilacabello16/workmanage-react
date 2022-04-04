@@ -12,7 +12,7 @@ const { SubMenu } = Menu;
 const LeftMenuLayout = () => {
     return (
         <Menu
-            defaultSelectedKeys={['5']}
+            //defaultSelectedKeys={['5']}
             defaultOpenKeys={['sub1']}
             mode="inline"
             style={{

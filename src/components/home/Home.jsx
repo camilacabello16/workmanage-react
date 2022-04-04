@@ -70,6 +70,19 @@ function Home() {
         setVisibleModalInvite(true);
     }
 
+    const removeUser = () => {
+        Modal.confirm({
+            title: "Do you want remove this member?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk() {
+                console.log("Ok");
+            },
+            onCancel() { },
+        });
+    }
+
     const columnBoard = [
         {
             title: '#',
@@ -176,6 +189,7 @@ function Home() {
                             <UserDeleteOutlined
                                 className="icon_action"
                                 style={{ color: "#E74C3C", fontSize: 18 }}
+                                onClick={() => removeUser()}
                             />
                         </Tooltip>
                     </span>
