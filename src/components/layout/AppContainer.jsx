@@ -11,13 +11,14 @@ import { Menu, Row, Col } from 'antd';
 import LeftMenuLayout from './LeftMenuLayout';
 import Registration from 'pages/registation/Registration';
 import BoardDetail from 'pages/board/BoardDetail';
+import moment from 'moment';
 
 const Home = lazy(() => import('components/home/Home'));
 const CustomHome = lazy(() => import('components/home/CustomHome'));
 
 function AppContainer() {
     useEffect(() => {
-        let userJSON = window.localStorage.getItem('user');
+        let userJSON = window.localStorage.getItem('auth_user');
 
         if (userJSON && userJSON != '') {
             //   let userData = JSON.parse(userJSON);
@@ -25,6 +26,10 @@ function AppContainer() {
             //     window.location.href = '/user/login';
             //   }
             //window.location.href = '/';
+            let expireTime = window.localStorage.getItem('token_expire_time');
+            if (moment(expireTime) < moment()) {
+                window.location.href = '/user/login';
+            }
         } else {
             if (!window.localStorage.getItem('isSignUp')) {
                 window.location.href = '/login';

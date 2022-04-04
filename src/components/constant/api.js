@@ -1,5 +1,7 @@
 export const ROOT_API = 'http://localhost:8085/workflow/api';
 
+export const API_ENPOINT = 'http://localhost:8085/workflow';
+
 //workspace
 export const API_WORKSPACE = '/workspace';
 export const API_WORKSPACE_SEARCH = '/workspace/search';
@@ -11,3 +13,9 @@ export const API_CARD_SEARCH = '/card/search';
 //task
 export const API_TASK = '/card';
 export const API_TASK_SEARCH = '/card/search';
+
+//workspace user
+export const API_WORKSPACE_USER = '/workspace-user';
+export const API_WORKSPACE_USER_SEARCH = '/workspace-user/search';
+export const API_WORKSPACE_USER_GET_BY_USER = '/workspace-user/user';
+export const API_WORKSPACE_USER_INVITE = '/workspace-user/invite';

@@ -4,9 +4,9 @@ import AppContainer from 'components/layout/AppContainer';
 import { Row } from 'antd';
 import Login from 'pages/login/Login';
 import Registration from 'pages/registation/Registration';
+import moment from 'moment';
 
 const App = () => {
-
 
     return (
         <Router>
