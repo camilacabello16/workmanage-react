@@ -28,7 +28,7 @@ function AppContainer() {
             //window.location.href = '/';
             let expireTime = window.localStorage.getItem('token_expire_time');
             if (moment(expireTime) < moment()) {
-                window.location.href = '/user/login';
+                window.location.href = '/login';
             }
         } else {
             if (!window.localStorage.getItem('isSignUp')) {
@@ -55,7 +55,7 @@ function AppContainer() {
                                 <Route path="/custom-home">
                                     <CustomHome />
                                 </Route>
-                                <Route exact path="/">
+                                <Route exact path="/workspace">
                                     <Home />
                                 </Route>
                                 <Route exact path="/board">

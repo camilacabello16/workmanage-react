@@ -22,7 +22,7 @@ import {
     UserAddOutlined,
     UserDeleteOutlined
 } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import 'antd/dist/antd.less';
 import FormWorkspace from '../../pages/workspace/FormWorkspace';
 import FormBoard from 'pages/board/FormBoard';
@@ -32,12 +32,21 @@ import {
     ROOT_API
 } from '../constant/api';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 const { Option } = Select;
 
+function useQuery() {
+    const { search } = useLocation();
+
+    return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 function Home() {
+    let query = useQuery();
+
     const history = useHistory();
     const [activeKey, setActiveKey] = useState('1');
     const [listBoard, setListBoard] = useState([
@@ -54,21 +63,24 @@ function Home() {
     const [visibleBoardModal, setVisibleBoardModal] = useState(false);
     const [visibleModalInvite, setVisibleModalInvite] = useState(false);
     //user
-    const [listUser, setListUser] = useState([
-        {
-            id: 1,
-            name: 'Hiếu',
-            role: 'Dev',
-            email: 'hieu@gmail.com'
-        }
-    ]);
+    const [listUser, setListUser] = useState([]);
+    const [workspaceDetail, setWorkspaceDetail] = useState({});
+
+    const getWorkspaceDetail = () => {
+        axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
+            setWorkspaceDetail(res.data);
+            setListBoard(res.data.childs);
+            setListUser(res.data.workSpaceUsers);
+        })
+    }
 
     useEffect(() => {
-        let userId = JSON.parse(window.localStorage.getItem('auth_user')).id;
-        axios.get(ROOT_API + API_WORKSPACE_USER_GET_BY_USER + '/' + userId).then(res => {
-            console.log(res);
-        })
-    }, [])
+        // let userId = JSON.parse(window.localStorage.getItem('auth_user')).id;
+        // axios.get(ROOT_API + API_WORKSPACE_USER_GET_BY_USER + '/' + userId).then(res => {
+        //     console.log(res);
+        // })
+        getWorkspaceDetail();
+    }, [query.get("id")])
 
     const openFormWorkspace = () => {
         setIsVisible(true);
@@ -84,9 +96,10 @@ function Home() {
 
     const columnBoard = [
         {
-            title: '#',
+            title: 'STT',
             key: 'STT',
             dataIndex: 'id',
+            render: (text, record, index) => <span>{index + 1}</span>
         },
         {
             title: 'Name',
@@ -116,14 +129,14 @@ function Home() {
         {
             title: 'Action',
             key: 'action',
-            render: () => {
+            render: (text, record) => {
                 return (
                     <span>
                         <Tooltip title="Detail">
                             <EyeOutlined
                                 className="icon_action"
                                 style={{ color: "#28a745", fontSize: 18 }}
-                                onClick={() => history.push('/board')}
+                                onClick={() => history.push('/board?id=' + record.id)}
                             />
                         </Tooltip>
                         <Tooltip title="Invite">
@@ -157,9 +170,10 @@ function Home() {
 
     const columnUser = [
         {
-            title: '#',
+            title: 'STT',
             key: 'STT',
             dataIndex: 'id',
+            render: (text, record, index) => <span>{index + 1}</span>
         },
         {
             title: 'Name',
@@ -199,7 +213,7 @@ function Home() {
     return (
         <div style={{ height: 'calc(100vh - 46px)' }}>
             <PageHeader
-                title="Workspace 1"
+                title={workspaceDetail.name}
                 extra={[
                     <Button
                         type="primary"
