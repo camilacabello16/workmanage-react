@@ -11,7 +11,8 @@ import {
     Table,
     Tooltip,
     Modal,
-    Select
+    Select,
+    notification
 } from 'antd';
 import LeftMenuLayout from 'components/layout/LeftMenuLayout';
 import {
@@ -29,7 +30,8 @@ import FormBoard from 'pages/board/FormBoard';
 import {
     API_WORKSPACE,
     API_WORKSPACE_USER_GET_BY_USER,
-    ROOT_API
+    ROOT_API,
+    API_USER
 } from '../constant/api';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -65,6 +67,7 @@ function Home() {
     //user
     const [listUser, setListUser] = useState([]);
     const [workspaceDetail, setWorkspaceDetail] = useState({});
+    const [currentBoard, setCurrentBoard] = useState({});
 
     const getWorkspaceDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
@@ -74,12 +77,19 @@ function Home() {
         })
     }
 
+    const getUsers = () => {
+        axios.get(ROOT_API + API_USER + '/1/1000', { headers: { "Authorization": `Bearer ${window.localStorage.getItem('jwt_token')}` } }).then(res => {
+            setListUser(res.data.content);
+        })
+    }
+
     useEffect(() => {
         // let userId = JSON.parse(window.localStorage.getItem('auth_user')).id;
         // axios.get(ROOT_API + API_WORKSPACE_USER_GET_BY_USER + '/' + userId).then(res => {
         //     console.log(res);
         // })
         getWorkspaceDetail();
+        getUsers();
     }, [query.get("id")])
 
     const openFormWorkspace = () => {
@@ -87,6 +97,7 @@ function Home() {
     }
 
     const openBoardModal = () => {
+        setCurrentBoard({});
         setVisibleBoardModal(true);
     }
 
@@ -102,6 +113,29 @@ function Home() {
             cancelText: "Cancel",
             onOk() {
                 console.log("Ok");
+            },
+            onCancel() { },
+        });
+    }
+
+    const openNotificationWithIcon = (type, message, description) => {
+        notification[type]({
+            message: message,
+            description: description,
+        });
+    };
+
+    const deleteBoard = (id) => {
+        Modal.confirm({
+            title: "Do you want delete this board?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk() {
+                axios.delete(ROOT_API + API_WORKSPACE + '/' + id).then(res => {
+                    openNotificationWithIcon('success', 'Delete success');
+                    getWorkspaceDetail();
+                })
             },
             onCancel() { },
         });
@@ -165,6 +199,11 @@ function Home() {
                             <EditOutlined
                                 className="icon_action"
                                 style={{ color: "#2db7f5", fontSize: 18 }}
+                                onClick={() => {
+                                    setCurrentBoard(record);
+                                    setVisibleBoardModal(true);
+                                }
+                                }
                             />
                         </Tooltip>
                         <Tooltip
@@ -173,6 +212,7 @@ function Home() {
                             <DeleteOutlined
                                 className="icon_action"
                                 style={{ color: "#E74C3C", fontSize: 18 }}
+                                onClick={() => deleteBoard(record.id)}
                             />
                         </Tooltip>
                     </span>
@@ -289,7 +329,10 @@ function Home() {
             />
             <FormBoard
                 visible={visibleBoardModal}
+                currentBoard={currentBoard}
                 setVisibleBoardModal={setVisibleBoardModal}
+                getWorkspaceDetail={getWorkspaceDetail}
+                parentId={query.get("id")}
             />
             <Modal
                 visible={visibleModalInvite}
@@ -306,8 +349,11 @@ function Home() {
                     mode="multiple"
                     allowClear
                 >
-                    <Option>Hiếu</Option>
-                    <Option>Hiếu</Option>
+                    {listUser.map((item, index) => {
+                        return (
+                            <Option key={index} value={item.username}>{item.username}</Option>
+                        );
+                    })}
                 </Select>
             </Modal>
         </div>

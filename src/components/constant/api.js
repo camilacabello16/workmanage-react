@@ -19,3 +19,6 @@ export const API_WORKSPACE_USER = '/workspace-user';
 export const API_WORKSPACE_USER_SEARCH = '/workspace-user/search';
 export const API_WORKSPACE_USER_GET_BY_USER = '/workspace-user/org';
 export const API_WORKSPACE_USER_INVITE = '/workspace-user/invite';
+
+//user
+export const API_USER = '/users';

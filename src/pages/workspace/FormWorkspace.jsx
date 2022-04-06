@@ -38,6 +38,7 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
     const onSubmit = () => {
         form.validateFields().then((values) => {
             console.log(values);
+            values.userIdHost = JSON.parse(window.localStorage.getItem('auth_user')).id;
             axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
                 openNotificationWithIcon('success', 'Create success');
                 setIsVisible(false);
