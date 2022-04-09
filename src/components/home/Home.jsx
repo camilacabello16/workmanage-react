@@ -46,7 +46,7 @@ function useQuery() {
     return useMemo(() => new URLSearchParams(search), [search]);
 }
 
-function Home() {
+const Home = ({ getOwnWorkspace }) => {
     let query = useQuery();
 
     const history = useHistory();
@@ -68,6 +68,14 @@ function Home() {
     const [listUser, setListUser] = useState([]);
     const [workspaceDetail, setWorkspaceDetail] = useState({});
     const [currentBoard, setCurrentBoard] = useState({});
+    const [workspaceEdit, setWorkspaceEdit] = useState({});
+    const [isInsert, setIsInsert] = useState(false);
+
+    const editWorkspace = () => {
+        setWorkspaceEdit(workspaceDetail);
+        setIsInsert(false);
+        openFormWorkspace();
+    }
 
     const getWorkspaceDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
@@ -93,6 +101,7 @@ function Home() {
     }, [query.get("id")])
 
     const openFormWorkspace = () => {
+        setIsInsert(true);
         setIsVisible(true);
     }
 
@@ -141,11 +150,29 @@ function Home() {
         });
     }
 
+    const deleteWorkspace = () => {
+        Modal.confirm({
+            title: "Do you want delete this workspace?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk() {
+                axios.delete(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
+                    openNotificationWithIcon('success', 'Delete success');
+                    getOwnWorkspace();
+                    history.push('/');
+                }).catch(err => {
+                    openNotificationWithIcon('error', 'Delete fail');
+                })
+            },
+            onCancel() { },
+        });
+    }
+
     const columnBoard = [
         {
             title: 'STT',
             key: 'STT',
-            dataIndex: 'id',
             render: (text, record, index) => <span>{index + 1}</span>
         },
         {
@@ -183,7 +210,9 @@ function Home() {
                             <EyeOutlined
                                 className="icon_action"
                                 style={{ color: "#28a745", fontSize: 18 }}
-                                onClick={() => history.push('/board?id=' + record.id)}
+                                onClick={() => history.push(
+                                    '/board?id=' + record.id,
+                                )}
                             />
                         </Tooltip>
                         <Tooltip title="Invite">
@@ -273,8 +302,8 @@ function Home() {
                         type="primary"
                         onClick={openFormWorkspace}
                     >Create</Button>,
-                    <Button type="primary">Edit</Button>,
-                    <Button type="primary">Delete</Button>
+                    <Button type="primary" onClick={editWorkspace}>Edit</Button>,
+                    <Button type="primary" onClick={deleteWorkspace}>Delete</Button>
                 ]}
             />
             <Card
@@ -326,6 +355,10 @@ function Home() {
             <FormWorkspace
                 visible={isVisible}
                 setIsVisible={setIsVisible}
+                workspaceEdit={workspaceEdit}
+                isInsert={isInsert}
+                getWorkspaceDetail={getWorkspaceDetail}
+                getOwnWorkspace={getOwnWorkspace}
             />
             <FormBoard
                 visible={visibleBoardModal}
@@ -349,11 +382,11 @@ function Home() {
                     mode="multiple"
                     allowClear
                 >
-                    {listUser.map((item, index) => {
+                    {/* {listUser.map((item, index) => {
                         return (
                             <Option key={index} value={item.username}>{item.username}</Option>
                         );
-                    })}
+                    })} */}
                 </Select>
             </Modal>
         </div>

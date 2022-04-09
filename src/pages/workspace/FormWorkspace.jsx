@@ -13,16 +13,29 @@ import {
     API_WORKSPACE
 } from '../../components/constant/api';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 const { Option } = Select;
 
-const FormWorkspace = ({ visible, setIsVisible }) => {
+const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetail, getOwnWorkspace, isInsert }) => {
     const [form] = Form.useForm();
     const layout = {
         labelCol: { span: 7 },
         wrapperCol: { span: 17 },
         align: 'left'
     };
+
+    useEffect(() => {
+        if (!workspaceEdit) {
+            return;
+        }
+        form.setFieldsValue({
+            name: workspaceEdit.name,
+            description: workspaceEdit.description,
+            type: workspaceEdit.type,
+            visibility: workspaceEdit.visibility
+        })
+    }, [workspaceEdit])
 
     const openNotificationWithIcon = (type, message, description) => {
         notification[type]({
@@ -39,10 +52,22 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
         form.validateFields().then((values) => {
             console.log(values);
             values.userIdHost = JSON.parse(window.localStorage.getItem('auth_user')).id;
-            axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
-                openNotificationWithIcon('success', 'Create success');
-                setIsVisible(false);
-            })
+            if (isInsert) {
+                axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
+                    openNotificationWithIcon('success', 'Create success');
+                    getOwnWorkspace();
+                    setIsVisible(false);
+                })
+            } else {
+                values.id = workspaceEdit.id;
+                axios.put(ROOT_API + API_WORKSPACE + '/' + workspaceEdit.id, values).then(res => {
+                    openNotificationWithIcon('success', 'Update success');
+                    getWorkspaceDetail();
+                    getOwnWorkspace();
+                    setIsVisible(false);
+                })
+            }
+
         })
     }
 
@@ -96,8 +121,12 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
                         optionFilterProp="children"
                         placeholder=""
                     >
-                        <Option key={1} value={"1"}>Small Business</Option>
-                        <Option key={2} value={"2"}>Marketing</Option>
+                        <Option key={1} value={1}>Small Business</Option>
+                        <Option key={2} value={2}>Marketing</Option>
+                        <Option key={3} value={3}>Sales</Option>
+                        <Option key={4} value={4}>Human resources</Option>
+                        <Option key={5} value={5}>Engineering-IT</Option>
+                        <Option key={6} value={6}>Operations</Option>
                     </Select>
                 </Form.Item>
                 <Form.Item
@@ -110,8 +139,8 @@ const FormWorkspace = ({ visible, setIsVisible }) => {
                     <Select
                         placeholder=""
                     >
-                        <Option key={1} value={"1"}>Private</Option>
-                        <Option key={2} value={"2"}>Public</Option>
+                        <Option key={1} value={1}>Private</Option>
+                        <Option key={2} value={2}>Public</Option>
                     </Select>
                 </Form.Item>
                 {/* <Form.Item

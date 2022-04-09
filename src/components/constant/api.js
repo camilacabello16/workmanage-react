@@ -9,10 +9,11 @@ export const API_WORKSPACE_SEARCH = '/workspace/search';
 //card
 export const API_CARD = '/card';
 export const API_CARD_SEARCH = '/card/search';
+export const API_CARD_UPDATE_VIEW = '/card/update-view';
 
 //task
-export const API_TASK = '/card';
-export const API_TASK_SEARCH = '/card/search';
+export const API_TASK = '/task';
+export const API_TASK_SEARCH = '/task/search';
 
 //workspace user
 export const API_WORKSPACE_USER = '/workspace-user';

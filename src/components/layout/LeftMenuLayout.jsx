@@ -16,38 +16,38 @@ import { Link } from 'react-router-dom';
 
 const { SubMenu } = Menu;
 
-const LeftMenuLayout = () => {
-    const [listWorkspaceOwn, setListWorkspaceOwn] = useState([]);
+const LeftMenuLayout = ({ listWorkspaceOwn }) => {
+    // const [listWorkspaceOwn, setListWorkspaceOwn] = useState([]);
 
-    const getOwnWorkspace = () => {
-        axios.post(ROOT_API + API_WORKSPACE_SEARCH, {
-            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
-            role: "ROLE_WORKSPACE_MANAGER",
-            pageIndex: 0,
-            pageSize: 100
-        }).then(res => {
-            console.log(res);
-            let listParentWp = [];
-            res.data.content.forEach(element => {
-                if (element.parent == null) {
-                    listParentWp.push(element);
-                }
-            });
-            setListWorkspaceOwn(listParentWp);
-        })
-    }
+    // const getOwnWorkspace = () => {
+    //     axios.post(ROOT_API + API_WORKSPACE_SEARCH, {
+    //         userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+    //         role: "ROLE_WORKSPACE_MANAGER",
+    //         pageIndex: 0,
+    //         pageSize: 100
+    //     }).then(res => {
+    //         console.log(res);
+    //         let listParentWp = [];
+    //         res.data.content.forEach(element => {
+    //             if (element.parent == null) {
+    //                 listParentWp.push(element);
+    //             }
+    //         });
+    //         setListWorkspaceOwn(listParentWp);
+    //     })
+    // }
 
-    useEffect(() => {
-        getOwnWorkspace();
-    }, []);
+    // useEffect(() => {
+    //     getOwnWorkspace();
+    // }, []);
 
     return (
         <Menu
             //defaultSelectedKeys={['5']}
-            defaultOpenKeys={['sub1']}
+            defaultOpenKeys={['sub1', 'sub2']}
             mode="inline"
             style={{
-                height: '100%'
+                height: '100vh'
             }}
             theme="dark"
         >

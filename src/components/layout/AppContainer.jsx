@@ -5,18 +5,47 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import ErrorBoundary from 'components/error/ErrorBoundary';
 import LoadingSpinner from 'components/shared/LoadingSpinner';
 import Login from '../../pages/login/Login';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import MenuLayout from './MenuLayout';
 import { Menu, Row, Col } from 'antd';
 import LeftMenuLayout from './LeftMenuLayout';
 import Registration from 'pages/registation/Registration';
 import BoardDetail from 'pages/board/BoardDetail';
 import moment from 'moment';
+import {
+    ROOT_API,
+    API_WORKSPACE_SEARCH
+} from '../constant/api';
+import axios from 'axios';
 
 const Home = lazy(() => import('components/home/Home'));
 const CustomHome = lazy(() => import('components/home/CustomHome'));
 
 function AppContainer() {
+    const [listWorkspaceOwn, setListWorkspaceOwn] = useState([]);
+
+    const getOwnWorkspace = () => {
+        axios.post(ROOT_API + API_WORKSPACE_SEARCH, {
+            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+            role: "ROLE_WORKSPACE_MANAGER",
+            pageIndex: 0,
+            pageSize: 100
+        }).then(res => {
+            console.log(res);
+            let listParentWp = [];
+            res.data.content.forEach(element => {
+                if (element.parent == null) {
+                    listParentWp.push(element);
+                }
+            });
+            setListWorkspaceOwn(listParentWp);
+        })
+    }
+
+    useEffect(() => {
+        getOwnWorkspace();
+    }, [])
+
     useEffect(() => {
         let userJSON = window.localStorage.getItem('auth_user');
 
@@ -47,7 +76,9 @@ function AppContainer() {
                     </Route>
                     <Row>
                         <Col span={4}>
-                            <LeftMenuLayout />
+                            <LeftMenuLayout
+                                listWorkspaceOwn={listWorkspaceOwn}
+                            />
                         </Col>
                         <Col span={20}>
                             <MenuLayout />
@@ -56,7 +87,9 @@ function AppContainer() {
                                     <CustomHome />
                                 </Route>
                                 <Route exact path="/workspace">
-                                    <Home />
+                                    <Home
+                                        getOwnWorkspace={getOwnWorkspace}
+                                    />
                                 </Route>
                                 <Route exact path="/board">
                                     <BoardDetail />
