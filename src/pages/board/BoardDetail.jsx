@@ -139,6 +139,19 @@ const BoardDetail = () => {
         })
     }
 
+    const getCardDrag = () => {
+        axios.post(ROOT_API + API_CARD_SEARCH, {
+            pageIndex: 0,
+            pageSize: 1000,
+            workSpaceId: query.get("id")
+        }).then(res => {
+            console.log(res);
+            res.data.content.sort(function (a, b) {
+                return a.viewIndex - b.viewIndex
+            })
+        })
+    }
+
     const getTask = () => {
         axios.post(ROOT_API + API_TASK_SEARCH, {
             pageIndex: 0,
@@ -179,8 +192,6 @@ const BoardDetail = () => {
             listCard.splice(source.index, 1);
             listCard.splice(destination.index, 0, cardDrag);
 
-            console.log(listCard);
-
             axios.put(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + cardDrag.id + '&&viewIndex=' + destination.index);
 
             for (let i = 0; i < listCard.length; i++) {
@@ -189,6 +200,7 @@ const BoardDetail = () => {
                         var indexChange2 = listCard[i].viewIndex + 1;
                         axios.put(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + listCard[i].id + '&&viewIndex=' + indexChange2).then(res => {
                             //getCard();
+                            getCardDrag();
                         })
                     }
                 } else {
@@ -196,6 +208,7 @@ const BoardDetail = () => {
                         var indexChange2 = listCard[i].viewIndex - 1;
                         axios.put(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + listCard[i].id + '&&viewIndex=' + indexChange2).then(res => {
                             //getCard();
+                            getCardDrag();
                         })
                     }
                 }
@@ -280,7 +293,7 @@ const BoardDetail = () => {
 
     const deleteBoard = () => {
         Modal.confirm({
-            title: "Do you want remove this task?",
+            title: "Do you want remove this board?",
             okText: "Yes",
             okType: "danger",
             cancelText: "Cancel",
