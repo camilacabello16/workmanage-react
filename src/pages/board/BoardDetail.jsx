@@ -9,7 +9,8 @@ import {
     Input,
     notification,
     Tooltip,
-    Spin
+    Spin,
+    Tabs
 } from 'antd';
 import React, { useState, useMemo, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -27,6 +28,8 @@ import axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
 import FormBoard from './FormBoard';
 import moment from 'moment';
+
+const { TabPane } = Tabs;
 
 function useQuery() {
     const { search } = useLocation();
@@ -309,9 +312,14 @@ const BoardDetail = () => {
         });
     }
 
+    const callback = (key) => {
+        console.log(key);
+    }
+
     return (
         <React.Fragment>
             <div style={{ height: 'calc(100vh - 46px)' }}>
+
                 <Spin spinning={loading}>
                     <Card
                         style={{
@@ -332,157 +340,163 @@ const BoardDetail = () => {
                             </Row>
                         }
                     >
-                        <div
-                            style={{ display: 'flex' }}
-                        >
-                            <DragDropContext
-                                onDragEnd={result => onDragEnd(result)}
-                            >
-                                <Droppable droppableId='board' type='list' direction='horizontal'>
-                                    {(provided) => (
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                            }}
-                                            ref={provided.innerRef}
-                                            {...provided.droppableProps}
-                                        >
-                                            {listCard.map((item, index) => {
-                                                return (
-                                                    <Draggable
-                                                        draggableId={item.id}
-                                                        index={index}
-                                                        key={item.id}
-                                                    >
-                                                        {(provided) => (
-                                                            <div
-                                                                style={{
-                                                                    marginRight: 10,
-                                                                    backgroundColor: '#000'
-                                                                }}
-                                                                key={index}
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
+                        <Tabs defaultActiveKey="1" onChange={callback}>
+                            <TabPane tab="Job" key="1">
+                                <div
+                                    style={{ display: 'flex' }}
+                                >
+                                    <DragDropContext
+                                        onDragEnd={result => onDragEnd(result)}
+                                    >
+                                        <Droppable droppableId='board' type='list' direction='horizontal'>
+                                            {(provided) => (
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                    }}
+                                                    ref={provided.innerRef}
+                                                    {...provided.droppableProps}
+                                                >
+                                                    {listCard.map((item, index) => {
+                                                        return (
+                                                            <Draggable
+                                                                draggableId={item.id}
+                                                                index={index}
+                                                                key={item.id}
                                                             >
-                                                                <h5 {...provided.dragHandleProps}>{item.name}</h5>
-                                                                <div
-                                                                    style={{
-                                                                        marginRight: 10,
-                                                                    }}
-                                                                >
-                                                                    <Droppable droppableId={item.id}>
-                                                                        {(provided1, snapshot) => {
-                                                                            return (
-                                                                                <div
-                                                                                    {...provided1.droppableProps}
-                                                                                    ref={provided1.innerRef}
-                                                                                    style={{
-                                                                                        background: snapshot.isDraggingOver
-                                                                                            ? "lightblue"
-                                                                                            : "lightgrey",
-                                                                                        padding: 4,
-                                                                                        width: 250,
-                                                                                        minHeight: 300,
-                                                                                        position: 'relative',
-                                                                                        paddingBottom: 40
-                                                                                    }}
-                                                                                >
-                                                                                    {listTask.map((item2, index) => {
-                                                                                        return (
-                                                                                            <span>
-                                                                                                {item2?.card?.id == item?.id &&
-                                                                                                    <Draggable
-                                                                                                        key={item2.id}
-                                                                                                        draggableId={item2.id}
-                                                                                                        index={index}
-                                                                                                    >
-                                                                                                        {(provided2, snapshot) => {
-                                                                                                            return (
-                                                                                                                <div
-                                                                                                                    ref={provided2.innerRef}
-                                                                                                                    {...provided2.draggableProps}
-                                                                                                                    style={{
-                                                                                                                        userSelect: "none",
-                                                                                                                        padding: 10,
-                                                                                                                        margin: "0 0 8px 0",
-                                                                                                                        backgroundColor: snapshot.isDragging
-                                                                                                                            ? "#0b806c"
-                                                                                                                            : "#17A589",
-                                                                                                                        color: "white",
-                                                                                                                        ...provided2.draggableProps.style
-                                                                                                                    }}
-                                                                                                                >
-                                                                                                                    <div
-                                                                                                                        style={{
-                                                                                                                            display: 'flex',
-                                                                                                                            alignItems: 'center',
-                                                                                                                            justifyContent: 'space-between'
-                                                                                                                        }}
-                                                                                                                    >
-                                                                                                                        <span
-                                                                                                                            {...provided2.dragHandleProps}
-                                                                                                                            style={{
-                                                                                                                                width: '100%'
-                                                                                                                            }}
-                                                                                                                        >{item2.name}</span>
-                                                                                                                        <Tooltip title="Edit">
-                                                                                                                            <EditOutlined
-                                                                                                                                style={{
-                                                                                                                                    cursor: 'pointer'
-                                                                                                                                }}
-                                                                                                                            />
-                                                                                                                        </Tooltip>
-                                                                                                                        <Tooltip title="Delete">
-                                                                                                                            <DeleteOutlined
-                                                                                                                                style={{
-                                                                                                                                    cursor: 'pointer',
-                                                                                                                                    marginLeft: 10
-                                                                                                                                }}
-                                                                                                                                onClick={() => deleteTask(item2.id)}
-                                                                                                                            />
-                                                                                                                        </Tooltip>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            );
-                                                                                                        }}
-                                                                                                    </Draggable>
-                                                                                                }
-
-                                                                                            </span>
-
-                                                                                        );
-                                                                                    })}
-                                                                                    {provided1.placeholder}
-                                                                                    <Button
-                                                                                        style={{
-                                                                                            width: '96.5%',
-                                                                                            position: 'absolute',
-                                                                                            bottom: 5
-                                                                                        }}
-                                                                                        className='button-icon'
-                                                                                        icon={<PlusOutlined></PlusOutlined>}
-                                                                                        onClick={() => insertTask(item.id)}
-                                                                                    >Add a card</Button>
-                                                                                </div>
-                                                                            );
+                                                                {(provided) => (
+                                                                    <div
+                                                                        style={{
+                                                                            marginRight: 10,
+                                                                            backgroundColor: '#000'
                                                                         }}
-                                                                    </Droppable>
+                                                                        key={index}
+                                                                        ref={provided.innerRef}
+                                                                        {...provided.draggableProps}
+                                                                    >
+                                                                        <h5 {...provided.dragHandleProps}>{item.name}</h5>
+                                                                        <div
+                                                                            style={{
+                                                                                marginRight: 10,
+                                                                            }}
+                                                                        >
+                                                                            <Droppable droppableId={item.id}>
+                                                                                {(provided1, snapshot) => {
+                                                                                    return (
+                                                                                        <div
+                                                                                            {...provided1.droppableProps}
+                                                                                            ref={provided1.innerRef}
+                                                                                            style={{
+                                                                                                background: snapshot.isDraggingOver
+                                                                                                    ? "lightblue"
+                                                                                                    : "lightgrey",
+                                                                                                padding: 4,
+                                                                                                width: 250,
+                                                                                                minHeight: 300,
+                                                                                                position: 'relative',
+                                                                                                paddingBottom: 40
+                                                                                            }}
+                                                                                        >
+                                                                                            {listTask.map((item2, index) => {
+                                                                                                return (
+                                                                                                    <span>
+                                                                                                        {item2?.card?.id == item?.id &&
+                                                                                                            <Draggable
+                                                                                                                key={item2.id}
+                                                                                                                draggableId={item2.id}
+                                                                                                                index={index}
+                                                                                                            >
+                                                                                                                {(provided2, snapshot) => {
+                                                                                                                    return (
+                                                                                                                        <div
+                                                                                                                            ref={provided2.innerRef}
+                                                                                                                            {...provided2.draggableProps}
+                                                                                                                            style={{
+                                                                                                                                userSelect: "none",
+                                                                                                                                padding: 10,
+                                                                                                                                margin: "0 0 8px 0",
+                                                                                                                                backgroundColor: snapshot.isDragging
+                                                                                                                                    ? "#0b806c"
+                                                                                                                                    : "#17A589",
+                                                                                                                                color: "white",
+                                                                                                                                ...provided2.draggableProps.style
+                                                                                                                            }}
+                                                                                                                        >
+                                                                                                                            <div
+                                                                                                                                style={{
+                                                                                                                                    display: 'flex',
+                                                                                                                                    alignItems: 'center',
+                                                                                                                                    justifyContent: 'space-between'
+                                                                                                                                }}
+                                                                                                                            >
+                                                                                                                                <span
+                                                                                                                                    {...provided2.dragHandleProps}
+                                                                                                                                    style={{
+                                                                                                                                        width: '100%'
+                                                                                                                                    }}
+                                                                                                                                >{item2.name}</span>
+                                                                                                                                <Tooltip title="Edit">
+                                                                                                                                    <EditOutlined
+                                                                                                                                        style={{
+                                                                                                                                            cursor: 'pointer'
+                                                                                                                                        }}
+                                                                                                                                    />
+                                                                                                                                </Tooltip>
+                                                                                                                                <Tooltip title="Delete">
+                                                                                                                                    <DeleteOutlined
+                                                                                                                                        style={{
+                                                                                                                                            cursor: 'pointer',
+                                                                                                                                            marginLeft: 10
+                                                                                                                                        }}
+                                                                                                                                        onClick={() => deleteTask(item2.id)}
+                                                                                                                                    />
+                                                                                                                                </Tooltip>
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    );
+                                                                                                                }}
+                                                                                                            </Draggable>
+                                                                                                        }
 
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </Draggable>
-                                                );
-                                            })}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </DragDropContext>
-                            <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => setVisibleCard(true)}>Add another list</Button>
-                        </div>
+                                                                                                    </span>
+
+                                                                                                );
+                                                                                            })}
+                                                                                            {provided1.placeholder}
+                                                                                            <Button
+                                                                                                style={{
+                                                                                                    width: '96.5%',
+                                                                                                    position: 'absolute',
+                                                                                                    bottom: 5
+                                                                                                }}
+                                                                                                className='button-icon'
+                                                                                                icon={<PlusOutlined></PlusOutlined>}
+                                                                                                onClick={() => insertTask(item.id)}
+                                                                                            >Add a card</Button>
+                                                                                        </div>
+                                                                                    );
+                                                                                }}
+                                                                            </Droppable>
+
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </Draggable>
+                                                        );
+                                                    })}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
+                                    <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => setVisibleCard(true)}>Add another list</Button>
+                                </div>
+                            </TabPane>
+                            <TabPane tab="Statistical" key="2"></TabPane>
+                        </Tabs>
                     </Card>
                 </Spin>
+
             </div>
             <Modal
                 title="Add Task"
