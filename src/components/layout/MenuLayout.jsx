@@ -11,12 +11,16 @@ import {
 } from 'antd';
 import 'antd/dist/antd.css';
 import { BellOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import FormWorkspace from 'pages/workspace/FormWorkspace';
 
-const MenuLayout = () => {
+const MenuLayout = ({ getOwnWorkspace }) => {
+    const [visible, setVisible] = useState(false);
+    const [isInsert, setIsInsert] = useState(true);
+
     const logout = () => {
         window.localStorage.removeItem('auth_user');
         window.localStorage.removeItem('token_expire_time');
-        window.localStorage.removeItem('jwt_token');
+        // window.localStorage.removeItem('jwt_token');
         window.location.href = '/login';
     }
 
@@ -163,7 +167,14 @@ const MenuLayout = () => {
                             }}
                         />
                     </Col>
-                    <Col span={14}></Col>
+                    <Col span={14}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'end'
+                        }}
+                    >
+                        <Button style={{ marginTop: 7 }} type="primary" onClick={() => setVisible(true)}>Create Workspace</Button>
+                    </Col>
                     <Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
                         <Dropdown overlay={notificationList} trigger={['click']}>
                             <BellOutlined
@@ -202,6 +213,12 @@ const MenuLayout = () => {
                     </Col>
                 </Row>
             </Menu>
+            <FormWorkspace
+                getOwnWorkspace={getOwnWorkspace}
+                visible={visible}
+                setIsVisible={setVisible}
+                isInsert={isInsert}
+            />
         </div>
     );
 }

@@ -31,7 +31,8 @@ import {
     API_WORKSPACE,
     API_WORKSPACE_USER_GET_BY_USER,
     ROOT_API,
-    API_USER
+    API_USER,
+    API_WORKSPACE_USER
 } from '../constant/api';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -46,8 +47,9 @@ function useQuery() {
     return useMemo(() => new URLSearchParams(search), [search]);
 }
 
-const Home = ({ getOwnWorkspace }) => {
+const Home = (props, { getOwnWorkspace }) => {
     let query = useQuery();
+    const location = useLocation()
 
     const history = useHistory();
     const [activeKey, setActiveKey] = useState('1');
@@ -70,6 +72,7 @@ const Home = ({ getOwnWorkspace }) => {
     const [currentBoard, setCurrentBoard] = useState({});
     const [workspaceEdit, setWorkspaceEdit] = useState({});
     const [isInsert, setIsInsert] = useState(false);
+    const [userNameInvite, setUserNameInvite] = useState('');
 
     const editWorkspace = () => {
         setWorkspaceEdit(workspaceDetail);
@@ -87,7 +90,13 @@ const Home = ({ getOwnWorkspace }) => {
 
     const getUsers = () => {
         axios.get(ROOT_API + API_USER + '/1/1000', { headers: { "Authorization": `Bearer ${window.localStorage.getItem('jwt_token')}` } }).then(res => {
-            setListUser(res.data.content);
+            let userArr = [];
+            res.data.content.forEach(element => {
+                if (element.id != JSON.parse(window.localStorage.getItem('auth_user')).id) {
+                    userArr.push(element);
+                }
+            });
+            setListUser(userArr);
         })
     }
 
@@ -98,6 +107,7 @@ const Home = ({ getOwnWorkspace }) => {
         // })
         getWorkspaceDetail();
         getUsers();
+        // console.log(location);
     }, [query.get("id")])
 
     const openFormWorkspace = () => {
@@ -167,6 +177,15 @@ const Home = ({ getOwnWorkspace }) => {
             },
             onCancel() { },
         });
+    }
+
+    const inviteMember = () => {
+        axios.post(ROOT_API + API_WORKSPACE_USER + '/' + query.get("id") + '/' + userNameInvite).then(res => {
+            openNotificationWithIcon('success', 'Invite member success');
+            setVisibleModalInvite(false);
+        }).catch(err => {
+            openNotificationWithIcon('success', 'Invite member fail');
+        })
     }
 
     const columnBoard = [
@@ -298,10 +317,11 @@ const Home = ({ getOwnWorkspace }) => {
             <PageHeader
                 title={workspaceDetail.name}
                 extra={[
-                    <Button
-                        type="primary"
-                        onClick={openFormWorkspace}
-                    >Create</Button>,
+                    <Button type='primary' onClick={openModalInvite}>Invite</Button>,
+                    // <Button
+                    //     type="primary"
+                    //     onClick={openFormWorkspace}
+                    // >Create</Button>,
                     <Button type="primary" onClick={editWorkspace}>Edit</Button>,
                     <Button type="primary" onClick={deleteWorkspace}>Delete</Button>
                 ]}
@@ -324,10 +344,36 @@ const Home = ({ getOwnWorkspace }) => {
                                 </Row>
                             }
                         >
-                            <Table
+                            {/* <Table
                                 columns={columnBoard}
                                 dataSource={listBoard}
-                            />
+                            /> */}
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap'
+                                }}
+                            >
+                                {listBoard?.map((item, index) => {
+                                    return (
+                                        <Card
+                                            key={index}
+                                            style={{
+                                                width: '20%',
+                                                marginRight: 10,
+                                                backgroundColor: '#e5e5e5',
+                                                cursor: 'pointer'
+                                            }}
+                                            onClick={() => history.push(
+                                                '/board?id=' + item.id,
+                                            )}
+                                        >
+                                            <p style={{ fontWeight: 'bold' }}>{item.name}</p>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+
                         </Card>
                     </TabPane>
                     <TabPane tab="Member" key="2">
@@ -371,23 +417,32 @@ const Home = ({ getOwnWorkspace }) => {
                 visible={visibleModalInvite}
                 title="Invite Members"
                 onCancel={() => setVisibleModalInvite(false)}
+                footer={null}
             >
-                <Select
-                    showSearch
-                    optionFilterProp="children"
-                    placeholder="Select members"
-                    style={{
-                        width: '100%'
-                    }}
-                    mode="multiple"
-                    allowClear
-                >
-                    {/* {listUser.map((item, index) => {
-                        return (
-                            <Option key={index} value={item.username}>{item.username}</Option>
-                        );
-                    })} */}
-                </Select>
+                <Row>
+                    <Col span={24}>
+                        <Select
+                            showSearch
+                            optionFilterProp="children"
+                            placeholder="Select members"
+                            style={{
+                                width: '100%'
+                            }}
+                            allowClear
+                            onChange={(e) => { setUserNameInvite(e) }}
+                        >
+                            {listUser.map((item, index) => {
+                                return (
+                                    <Option key={index} value={item.username}>{item.username}</Option>
+                                );
+                            })}
+                        </Select>
+                    </Col>
+                    <Col span={24} style={{ marginTop: 10, display: 'flex', justifyContent: 'end' }}>
+                        <Button type='primary' onClick={inviteMember}>Invite</Button>
+                    </Col>
+                </Row>
+
             </Modal>
         </div>
     );

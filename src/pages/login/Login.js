@@ -48,12 +48,12 @@ const Login = () => {
             setLoginUser(res.data);
         });
 
-        await getAllMenuItemByRoleList().then(res => {
-            //window.localStorage.setSessionItem("navigations",res.data);
-            //window.localStorage.setLocalStorageItem("navigations", res.data);
-            openNotificationWithIcon("success", "Login success");
-            window.location.href = "/";
-        });
+        // await getAllMenuItemByRoleList().then(res => {
+        //window.localStorage.setSessionItem("navigations",res.data);
+        //window.localStorage.setLocalStorageItem("navigations", res.data);
+        openNotificationWithIcon("success", "Login success");
+        window.location.href = "/";
+        // });
 
         //window.localStorage.setItem('user', JSON.stringify(values));
         // openNotificationWithIcon("success", "Login success")

@@ -9,37 +9,40 @@ import {
 import {
     API_WORKSPACE_USER_GET_BY_USER,
     ROOT_API,
-    API_WORKSPACE_SEARCH
+    API_WORKSPACE_SEARCH,
+    API_WORKSPACE_USER_SEARCH
 } from '../constant/api';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 const { SubMenu } = Menu;
 
 const LeftMenuLayout = ({ listWorkspaceOwn }) => {
-    // const [listWorkspaceOwn, setListWorkspaceOwn] = useState([]);
+    const history = useHistory();
 
-    // const getOwnWorkspace = () => {
-    //     axios.post(ROOT_API + API_WORKSPACE_SEARCH, {
-    //         userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
-    //         role: "ROLE_WORKSPACE_MANAGER",
-    //         pageIndex: 0,
-    //         pageSize: 100
-    //     }).then(res => {
-    //         console.log(res);
-    //         let listParentWp = [];
-    //         res.data.content.forEach(element => {
-    //             if (element.parent == null) {
-    //                 listParentWp.push(element);
-    //             }
-    //         });
-    //         setListWorkspaceOwn(listParentWp);
-    //     })
-    // }
+    const [listWorkspace, setListWorkspace] = useState([]);
 
-    // useEffect(() => {
-    //     getOwnWorkspace();
-    // }, []);
+    const getWorkspace = () => {
+        axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
+            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+            role: "ROLE_WORKSPACE_USER",
+            pageIndex: 0,
+            pageSize: 100
+        }).then(res => {
+            let listParentWp = [];
+            res.data.content.forEach(element => {
+                if (element.parent == null) {
+                    listParentWp.push(element);
+                }
+            });
+            setListWorkspace(listParentWp);
+        })
+    }
+
+    useEffect(() => {
+        getWorkspace();
+    }, []);
 
     return (
         <Menu
@@ -51,30 +54,33 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
             }}
             theme="dark"
         >
-            <Menu.Item>
-                <div
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '10px 0',
+                    cursor: 'pointer'
+                }}
+                onClick={() => history.push(
+                    '/'
+                )}
+            >
+                <img
+                    src={require('../../asset/logo2.jpg')}
                     style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
+                        width: 40,
+                        height: 40,
+                        marginRight: 10,
                     }}
-                >
-                    <img
-                        src={require('../../asset/logo2.jpg')}
-                        style={{
-                            width: 40,
-                            height: 40,
-                            marginRight: 10
-                        }}
-                    />
-                    <span
-                        style={{
-                            fontSize: 20,
-                            fontWeight: 'bold'
-                        }}
-                    >Joinco</span>
-                </div>
-            </Menu.Item>
+                />
+                <span
+                    style={{
+                        fontSize: 20,
+                        fontWeight: 'bold'
+                    }}
+                >Joinco</span>
+            </div>
             {/* <Menu.Item key="1" icon={<PieChartOutlined />}>
                 Boards
             </Menu.Item> */}
@@ -82,8 +88,21 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
                 {listWorkspaceOwn.map((item, index) => {
                     return (
                         <Menu.Item key={index}>
-                            <Link to={'workspace?id=' + item.id}>
-                                {item.name}
+                            <Link
+                                // to={
+                                //     'workspace?id=' + item.workSpace.id
+                                //     // state: { workspaceItem: item }
+                                // }
+                                // onClick={() => {
+                                //     history.push({
+                                //         pathname: `${'workspace?id=' + item.workSpace.id}`,
+                                //         state: { workspaceItem: item }
+                                //     })
+                                // }}
+                                // to={'workspace?id=' + item.workSpace.id}
+                                to={{ pathname: `${'workspace?id=' + item.workSpace.id}`, state: { workspaceItem: item } }}
+                            >
+                                {item.workSpace.name}
                             </Link>
                         </Menu.Item>
                     );
@@ -95,6 +114,15 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
                 <Menu.Item key="6">Option 6</Menu.Item>
                 <Menu.Item key="7">Option 7</Menu.Item>
                 <Menu.Item key="8">Option 8</Menu.Item> */}
+                {listWorkspace.map((item, index) => {
+                    return (
+                        <Menu.Item key={index}>
+                            <Link to={'workspace?id=' + item.workSpace.id}>
+                                {item.workSpace.name}
+                            </Link>
+                        </Menu.Item>
+                    );
+                })}
             </SubMenu>
         </Menu >
     );

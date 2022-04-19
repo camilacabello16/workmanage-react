@@ -14,9 +14,11 @@ import BoardDetail from 'pages/board/BoardDetail';
 import moment from 'moment';
 import {
     ROOT_API,
-    API_WORKSPACE_SEARCH
+    API_WORKSPACE_SEARCH,
+    API_WORKSPACE_USER_SEARCH
 } from '../constant/api';
 import axios from 'axios';
+import StartPage from 'pages/begin/StartPage';
 
 const Home = lazy(() => import('components/home/Home'));
 const CustomHome = lazy(() => import('components/home/CustomHome'));
@@ -25,8 +27,8 @@ function AppContainer() {
     const [listWorkspaceOwn, setListWorkspaceOwn] = useState([]);
 
     const getOwnWorkspace = () => {
-        axios.post(ROOT_API + API_WORKSPACE_SEARCH, {
-            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+        axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
+            userId: JSON.parse(window.localStorage.getItem('auth_user'))?.id,
             role: "ROLE_WORKSPACE_MANAGER",
             pageIndex: 0,
             pageSize: 100
@@ -34,7 +36,7 @@ function AppContainer() {
             console.log(res);
             let listParentWp = [];
             res.data.content.forEach(element => {
-                if (element.parent == null) {
+                if (element.workSpace.parent == null) {
                     listParentWp.push(element);
                 }
             });
@@ -81,8 +83,13 @@ function AppContainer() {
                             />
                         </Col>
                         <Col span={20}>
-                            <MenuLayout />
+                            <MenuLayout
+                                getOwnWorkspace={getOwnWorkspace}
+                            />
                             <Suspense fallback={<LoadingSpinner />}>
+                                <Route exact path="/">
+                                    <StartPage />
+                                </Route>
                                 <Route path="/custom-home">
                                     <CustomHome />
                                 </Route>

@@ -5,6 +5,7 @@ export const API_ENPOINT = 'http://localhost:8085/workflow';
 //workspace
 export const API_WORKSPACE = '/workspace';
 export const API_WORKSPACE_SEARCH = '/workspace/search';
+export const API_WORKSPACE_INVITE = '/workspace/invite';
 
 //card
 export const API_CARD = '/card';
@@ -23,3 +24,11 @@ export const API_WORKSPACE_USER_INVITE = '/workspace-user/invite';
 
 //user
 export const API_USER = '/users';
+
+//template
+export const API_TEMPLATE = '/template/workspace';
+export const API_TEMPLATE_SEARCH = '/template/workspace/search';
+export const API_TEMPLATE_CLONE = '/workspace/clone-template';
+
+//notification
+export const API_NOTIFICATION_DELETE = '/notification';

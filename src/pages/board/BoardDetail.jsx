@@ -10,11 +10,14 @@ import {
     notification,
     Tooltip,
     Spin,
-    Tabs
+    Tabs,
+    Dropdown,
+    Menu,
+    Select
 } from 'antd';
 import React, { useState, useMemo, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
 import {
     ROOT_API,
     API_CARD,
@@ -22,7 +25,10 @@ import {
     API_CARD_SEARCH,
     API_TASK_SEARCH,
     API_WORKSPACE,
-    API_CARD_UPDATE_VIEW
+    API_CARD_UPDATE_VIEW,
+    API_TEMPLATE,
+    API_TEMPLATE_SEARCH,
+    API_TEMPLATE_CLONE
 } from '../../components/constant/api';
 import axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -41,6 +47,8 @@ const BoardDetail = () => {
     let query = useQuery();
     const [formTask] = Form.useForm();
     const [formCard] = Form.useForm();
+    const [formTemplate] = Form.useForm();
+    const [formCloneTemplate] = Form.useForm();
 
     const [listCard, setListCard] = useState([
         {
@@ -116,12 +124,43 @@ const BoardDetail = () => {
     const [visibleFormBoard, setVisibleFormBoard] = useState(false);
     const [boardParentId, setBoardParentId] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isEditCard, setIsEditCard] = useState(false);
+    const [cardItemEdit, setCardItemEdit] = useState({});
+    const [isEditTask, setIsEditTask] = useState(false);
+    const [taskItemEdit, setTaskItemEdit] = useState({});
+    const [visibleAddTemplate, setVisibleTemplate] = useState(false);
+    const [listTemplate, setListTemplate] = useState([]);
+    const [visibleCloneTemplate, setVisibleCloneTemplate] = useState(false);
 
     const getBoardDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
             setBoardDetail(res.data);
             setBoardParentId(res.data.parent.id);
         })
+    }
+
+    useEffect(() => {
+        getCard();
+        getTask();
+        getBoardDetail();
+    }, [query.get("id")])
+
+    const onCloseCloneTemplate = () => {
+        setVisibleCloneTemplate(false);
+    }
+
+    const getListTemplate = () => {
+        axios.post(ROOT_API + API_TEMPLATE_SEARCH, {
+            pageSize: 100,
+            pageIndex: 0
+        }).then(res => {
+            console.log(res);
+            setListTemplate(res.data.content);
+        })
+    }
+
+    const onCloseTemplate = () => {
+        setVisibleTemplate(false);
     }
 
     const getCard = () => {
@@ -131,14 +170,18 @@ const BoardDetail = () => {
             pageSize: 1000,
             workSpaceId: query.get("id")
         }).then(res => {
-            console.log(res);
             res.data.content.sort(function (a, b) {
                 return a.viewIndex - b.viewIndex
-            })
+            });
+            for (let i = 0; i < res.data.content.length; i++) {
+                res.data.content[i].numberTask = res.data.content[i].tasks?.length;
+            }
             setListCard(res.data.content);
-            setTimeout(() => {
-                setLoading(false);
-            }, 1000);
+            console.log(res.data.content);
+            // setTimeout(() => {
+            //     setLoading(false);
+            // }, 1000);
+            setLoading(false);
         })
     }
 
@@ -170,6 +213,7 @@ const BoardDetail = () => {
         getCard();
         getTask();
         getBoardDetail();
+        getListTemplate();
     }, [])
 
     const onDragEnd = (result, columns, setColumns) => {
@@ -187,6 +231,7 @@ const BoardDetail = () => {
             taskDrag.card = cardChange;
             axios.put(ROOT_API + API_TASK + '/' + result.draggableId, taskDrag).then(res => {
                 console.log(res);
+                getCard();
             })
         } else {
             var cardDrag = listCard.find(o => o.id == result.draggableId);
@@ -195,13 +240,13 @@ const BoardDetail = () => {
             listCard.splice(source.index, 1);
             listCard.splice(destination.index, 0, cardDrag);
 
-            axios.put(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + cardDrag.id + '&&viewIndex=' + destination.index);
+            axios.post(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + cardDrag.id + '&&viewIndex=' + destination.index);
 
             for (let i = 0; i < listCard.length; i++) {
                 if (destination.index < source.index) {
                     if (listCard[i].viewIndex >= destination.index && listCard[i].viewIndex <= source.index && listCard[i].id != cardDrag.id) {
                         var indexChange2 = listCard[i].viewIndex + 1;
-                        axios.put(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + listCard[i].id + '&&viewIndex=' + indexChange2).then(res => {
+                        axios.post(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + listCard[i].id + '&&viewIndex=' + indexChange2).then(res => {
                             //getCard();
                             getCardDrag();
                         })
@@ -209,7 +254,7 @@ const BoardDetail = () => {
                 } else {
                     if (listCard[i].viewIndex <= destination.index && listCard[i].viewIndex >= source.index && listCard[i].id != cardDrag.id) {
                         var indexChange2 = listCard[i].viewIndex - 1;
-                        axios.put(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + listCard[i].id + '&&viewIndex=' + indexChange2).then(res => {
+                        axios.post(ROOT_API + API_CARD_UPDATE_VIEW + '?id=' + listCard[i].id + '&&viewIndex=' + indexChange2).then(res => {
                             //getCard();
                             getCardDrag();
                         })
@@ -248,14 +293,29 @@ const BoardDetail = () => {
             id: insertToCardId
         }
         value.card = card;
-        axios.post(ROOT_API + API_TASK, value).then(res => {
-            getTask();
-            openNotificationWithIcon('success', 'Insert task success');
-            onCloseTask();
-            formTask.resetFields();
-        }).catch(err => {
-            openNotificationWithIcon('error', 'Insert task fail');
-        })
+        if (!isEditTask) {
+            axios.post(ROOT_API + API_TASK, value).then(res => {
+                getTask();
+                getCard();
+                openNotificationWithIcon('success', 'Insert task success');
+                onCloseTask();
+                formTask.resetFields();
+            }).catch(err => {
+                openNotificationWithIcon('error', 'Insert task fail');
+            })
+        }
+        else {
+            value.id = taskItemEdit.id;
+            axios.put(ROOT_API + API_TASK + '/' + taskItemEdit.id, value).then(res => {
+                getTask();
+                openNotificationWithIcon('success', 'Update task success');
+                onCloseTask();
+                formTask.resetFields();
+            }).catch(err => {
+                openNotificationWithIcon('error', 'Update task fail');
+            })
+        }
+
     }
 
     const onAddCard = (value) => {
@@ -263,16 +323,40 @@ const BoardDetail = () => {
             id: query.get("id")
         }
         value.workSpace = workspace;
-        value.viewIndex = listCard.length;
-        axios.post(ROOT_API + API_CARD, value).then(res => {
-            getCard();
-            openNotificationWithIcon('success', 'Insert card success');
-            onCloseCard();
-            formCard.resetFields();
-            formTask.resetFields();
-        }).catch(err => {
-            openNotificationWithIcon('error', 'Insert card fail');
-        })
+        if (!isEditCard) {
+            value.viewIndex = listCard.length;
+            axios.post(ROOT_API + API_CARD, value).then(res => {
+                getCard();
+                openNotificationWithIcon('success', 'Insert card success');
+                onCloseCard();
+                formCard.resetFields();
+                formTask.resetFields();
+            }).catch(err => {
+                openNotificationWithIcon('error', 'Insert card fail');
+            })
+        }
+        else {
+            value.id = cardItemEdit.id;
+            value.viewIndex = cardItemEdit.viewIndex;
+            axios.put(ROOT_API + API_CARD + '/' + cardItemEdit.id, value).then(res => {
+                getCard();
+                openNotificationWithIcon('success', 'Update card success');
+                onCloseCard();
+                formCard.resetFields();
+                formTask.resetFields();
+            }).catch(err => {
+                openNotificationWithIcon('error', 'Update card fail');
+            })
+        }
+    }
+
+    const editCard = (item) => {
+        formCard.setFieldsValue({
+            name: item.name
+        });
+        setIsEditCard(true);
+        setCardItemEdit(item);
+        setVisibleCard(true);
     }
 
     const deleteTask = (id) => {
@@ -316,6 +400,90 @@ const BoardDetail = () => {
         console.log(key);
     }
 
+    const deleteCard = (id) => {
+        Modal.confirm({
+            title: "Do you want remove this card?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk() {
+                axios.delete(ROOT_API + API_CARD + '/' + id).then(res => {
+                    openNotificationWithIcon('success', 'Delete card success');
+                    getCard();
+                }).catch(err => {
+                    openNotificationWithIcon('error', 'Delete card fail');
+                })
+            },
+            onCancel() { },
+        });
+    }
+
+    const editTask = (item) => {
+        formTask.setFieldsValue({
+            name: item.name,
+            startDate: moment(item.startDate),
+            endDate: moment(item.endDate)
+        });
+        setInsertToCardId(item.card.id);
+        setIsEditTask(true);
+        setTaskItemEdit(item);
+        setVisibleTask(true);
+    }
+
+    const onAddTemplate = (value) => {
+        var cardClone = listCard;
+        var boardClone = boardDetail;
+        for (let i = 0; i < cardClone.length; i++) {
+            delete cardClone[i].id;
+            if (cardClone[i].tasks) {
+                for (let j = 0; j < cardClone[i].tasks.length; j++) {
+                    delete cardClone[i].tasks[j].id;
+                }
+            }
+        }
+
+        boardClone.cards = cardClone;
+        boardClone.name = value.name;
+        boardClone.user_id = JSON.parse(window.localStorage.getItem('auth_user')).id;
+        console.log(boardClone);
+        axios.post(ROOT_API + API_TEMPLATE, boardClone).then(res => {
+            openNotificationWithIcon('success', 'Create template success');
+            onCloseTemplate();
+            getCard();
+            getTask();
+            formTemplate.resetFields();
+        }).catch(err => {
+            openNotificationWithIcon('error', 'Create template fail');
+        })
+    }
+
+    const createTemplate = () => {
+        setVisibleTemplate(true);
+    }
+
+    const cloneTemplate = (item) => {
+        let cloneObj = {};
+        cloneObj.userIdHost = JSON.parse(window.localStorage.getItem('auth_user')).id;
+        cloneObj.idTemplateWorkSpace = item;
+        cloneObj.parent = {
+            id: boardDetail.parent.id
+        }
+        console.log(cloneObj);
+        axios.post(ROOT_API + API_TEMPLATE_CLONE, cloneObj).then(res => {
+            openNotificationWithIcon('success', 'Create board from template success');
+            history.push('/board?id=' + res.data.id);
+            getBoardDetail();
+            getCard();
+            getTask();
+        }).catch(err => {
+            openNotificationWithIcon('success', 'Create board from template fail');
+        })
+    }
+
+    const onCloneTemplate = (value) => {
+
+    }
+
     return (
         <React.Fragment>
             <div style={{ height: 'calc(100vh - 46px)' }}>
@@ -330,18 +498,32 @@ const BoardDetail = () => {
                             <Row>
                                 <Col span={6}>{boardDetail.name}</Col>
 
-                                <Col span={12}></Col>
-                                <Col span={6} style={{ textAlign: 'right' }}>
+                                <Col span={6}></Col>
+                                <Col span={12} style={{ textAlign: 'right' }}>
                                     <Button onClick={() => history.push('/workspace?id=' + boardParentId)} style={{ marginRight: 10 }}>Back</Button>
-                                    <Button>Invite</Button>
+                                    {/* <Button>Invite</Button> */}
                                     <Button type='primary' style={{ marginLeft: 10 }} onClick={() => setVisibleFormBoard(true)}>Edit</Button>
                                     <Button type='primary' style={{ marginLeft: 10 }} onClick={deleteBoard}>Delete</Button>
+                                    <Button type='primary' style={{ marginLeft: 10 }} onClick={createTemplate}>Create Template</Button>
+                                    <Select
+                                        showSearch
+                                        filterOption="children"
+                                        style={{ marginLeft: 10, width: '25%' }}
+                                        placeholder="Choose template"
+                                        onChange={(e) => cloneTemplate(e)}
+                                    >
+                                        {listTemplate.map((item, index) => {
+                                            return (
+                                                <Select.Option key={index} value={item.id}>{item.name}</Select.Option>
+                                            );
+                                        })}
+                                    </Select>
                                 </Col>
                             </Row>
                         }
                     >
                         <Tabs defaultActiveKey="1" onChange={callback}>
-                            <TabPane tab="Job" key="1">
+                            <TabPane tab="Board" key="1">
                                 <div
                                     style={{ display: 'flex' }}
                                 >
@@ -374,7 +556,21 @@ const BoardDetail = () => {
                                                                         ref={provided.innerRef}
                                                                         {...provided.draggableProps}
                                                                     >
-                                                                        <h5 {...provided.dragHandleProps}>{item.name}</h5>
+                                                                        <div style={{ display: 'flex', width: '90%', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                            <h5 {...provided.dragHandleProps}>{item.name} <span style={{ fontWeight: '400!important', fontSize: 14 }}>({item.numberTask ? item.numberTask : 0})</span></h5>
+
+                                                                            <Dropdown
+                                                                                trigger={['click']}
+                                                                                overlay={
+                                                                                    <Menu>
+                                                                                        <Menu.Item key="1" onClick={() => editCard(item)}>Edit</Menu.Item>
+                                                                                        <Menu.Item key="2" onClick={() => deleteCard(item.id)}>Delete</Menu.Item>
+                                                                                    </Menu>
+                                                                                }
+                                                                            >
+                                                                                <EllipsisOutlined />
+                                                                            </Dropdown>
+                                                                        </div>
                                                                         <div
                                                                             style={{
                                                                                 marginRight: 10,
@@ -440,6 +636,7 @@ const BoardDetail = () => {
                                                                                                                                         style={{
                                                                                                                                             cursor: 'pointer'
                                                                                                                                         }}
+                                                                                                                                        onClick={() => editTask(item2)}
                                                                                                                                     />
                                                                                                                                 </Tooltip>
                                                                                                                                 <Tooltip title="Delete">
@@ -471,7 +668,7 @@ const BoardDetail = () => {
                                                                                                 }}
                                                                                                 className='button-icon'
                                                                                                 icon={<PlusOutlined></PlusOutlined>}
-                                                                                                onClick={() => insertTask(item.id)}
+                                                                                                onClick={() => { insertTask(item.id); setIsEditTask(false); }}
                                                                                             >Add a card</Button>
                                                                                         </div>
                                                                                     );
@@ -489,7 +686,7 @@ const BoardDetail = () => {
                                             )}
                                         </Droppable>
                                     </DragDropContext>
-                                    <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => setVisibleCard(true)}>Add another list</Button>
+                                    <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => { setVisibleCard(true); setIsEditCard(false); }}>Add another list</Button>
                                 </div>
                             </TabPane>
                             <TabPane tab="Statistical" key="2"></TabPane>
@@ -572,6 +769,85 @@ const BoardDetail = () => {
                     onFinish={onAddCard}
                 >
                     <Row>
+                        <Col span={24}>
+                            <Form.Item
+                                name="name"
+                                label="Name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please enter task name'
+                                    }
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item>
+                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Submit</Button>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
+            <Modal
+                title="Create Template"
+                visible={visibleAddTemplate}
+                onCancel={onCloseTemplate}
+                footer={null}
+            >
+                <Form
+                    layout="vertical"
+                    form={formTemplate}
+                    onFinish={onAddTemplate}
+                >
+                    <Row>
+                        <Col span={24}>
+                            <Form.Item
+                                name="name"
+                                label="Name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please enter task name'
+                                    }
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item>
+                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Submit</Button>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
+            <Modal
+                title="Create Board"
+                visible={visibleCloneTemplate}
+                onCancel={onCloseCloneTemplate}
+                footer={null}
+            >
+                <Form
+                    layout="vertical"
+                    form={formCloneTemplate}
+                    onFinish={onCloneTemplate}
+                >
+                    <Row>
+                        <Col span={24}>
+                            <Form.Item
+                                name="id"
+                                label="id"
+                                style={{
+                                    display: 'none'
+                                }}
+                            >
+                                <Input />
+                            </Form.Item>
+                        </Col>
                         <Col span={24}>
                             <Form.Item
                                 name="name"

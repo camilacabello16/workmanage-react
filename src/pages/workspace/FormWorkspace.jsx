@@ -55,6 +55,7 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
             if (isInsert) {
                 axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
                     openNotificationWithIcon('success', 'Create success');
+                    // onClose();
                     getOwnWorkspace();
                     setIsVisible(false);
                 })
