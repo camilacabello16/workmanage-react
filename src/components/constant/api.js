@@ -32,3 +32,6 @@ export const API_TEMPLATE_CLONE = '/workspace/clone-template';
 
 //notification
 export const API_NOTIFICATION_DELETE = '/notification';
+
+//receive notification
+export const API_RECEIVE_NOTIFICATION = '/receiver-notification';

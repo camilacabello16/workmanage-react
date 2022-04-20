@@ -99,8 +99,8 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
                                 //         state: { workspaceItem: item }
                                 //     })
                                 // }}
-                                // to={'workspace?id=' + item.workSpace.id}
-                                to={{ pathname: `${'workspace?id=' + item.workSpace.id}`, state: { workspaceItem: item } }}
+                                to={'workspace?id=' + item.workSpace.id + '&type=manager'}
+                            // to={{ pathname: `${'workspace?id=' + item.workSpace.id + '&type=' + 'manager'}`, state: { workspaceItem: item } }}
                             >
                                 {item.workSpace.name}
                             </Link>
@@ -117,7 +117,7 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
                 {listWorkspace.map((item, index) => {
                     return (
                         <Menu.Item key={index}>
-                            <Link to={'workspace?id=' + item.workSpace.id}>
+                            <Link to={'workspace?id=' + item.workSpace.id + '&type=user'}>
                                 {item.workSpace.name}
                             </Link>
                         </Menu.Item>

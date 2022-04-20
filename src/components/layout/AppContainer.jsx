@@ -44,8 +44,29 @@ function AppContainer() {
         })
     }
 
+    const [listWorkspace, setListWorkspace] = useState([]);
+
+    const getListWorkspace = () => {
+        axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
+            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+            role: "ROLE_WORKSPACE_USER",
+            pageIndex: 0,
+            pageSize: 100,
+            status: 1
+        }).then(res => {
+            let listParentWp = [];
+            res.data.content.forEach(element => {
+                if (element.workSpace.parent == null) {
+                    listParentWp.push(element);
+                }
+            });
+            setListWorkspace(listParentWp);
+        })
+    }
+
     useEffect(() => {
         getOwnWorkspace();
+        getListWorkspace();
     }, [])
 
     useEffect(() => {
@@ -85,10 +106,14 @@ function AppContainer() {
                         <Col span={20}>
                             <MenuLayout
                                 getOwnWorkspace={getOwnWorkspace}
+                                getListWorkspace={getListWorkspace}
                             />
                             <Suspense fallback={<LoadingSpinner />}>
                                 <Route exact path="/">
-                                    <StartPage />
+                                    <StartPage
+                                        listWorkspace={listWorkspace}
+                                        listOwnWorkspace={listWorkspaceOwn}
+                                    />
                                 </Route>
                                 <Route path="/custom-home">
                                     <CustomHome />
@@ -96,6 +121,7 @@ function AppContainer() {
                                 <Route exact path="/workspace">
                                     <Home
                                         getOwnWorkspace={getOwnWorkspace}
+                                        getListWorkspace={getListWorkspace}
                                     />
                                 </Route>
                                 <Route exact path="/board">

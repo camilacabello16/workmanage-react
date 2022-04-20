@@ -32,7 +32,8 @@ import {
     API_WORKSPACE_USER_GET_BY_USER,
     ROOT_API,
     API_USER,
-    API_WORKSPACE_USER
+    API_WORKSPACE_USER,
+    API_WORKSPACE_USER_INVITE
 } from '../constant/api';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -47,7 +48,7 @@ function useQuery() {
     return useMemo(() => new URLSearchParams(search), [search]);
 }
 
-const Home = (props, { getOwnWorkspace }) => {
+const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
     let query = useQuery();
     const location = useLocation()
 
@@ -107,6 +108,7 @@ const Home = (props, { getOwnWorkspace }) => {
         // })
         getWorkspaceDetail();
         getUsers();
+        console.log(query.get("type"));
         // console.log(location);
     }, [query.get("id")])
 
@@ -186,6 +188,30 @@ const Home = (props, { getOwnWorkspace }) => {
         }).catch(err => {
             openNotificationWithIcon('success', 'Invite member fail');
         })
+    }
+
+    const leaveWorkspace = () => {
+        var workspaceUserId = listUser.find(o => o.user.id == JSON.parse(window.localStorage.getItem('auth_user')).id).id;
+
+        Modal.confirm({
+            title: "Do you want leave this workspace?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk() {
+                axios.put(ROOT_API + API_WORKSPACE_USER_INVITE + '/' + workspaceUserId + '/' + false).then(res => {
+
+                    openNotificationWithIcon('success', 'Leave workspace');
+                }).catch(err => {
+                    console.log(err);
+                });
+                // getListWorkspace();
+                // getOwnWorkspace();
+                // history.push('/');
+                window.location.href = "/";
+            },
+            onCancel() { },
+        });
     }
 
     const columnBoard = [
@@ -279,17 +305,32 @@ const Home = (props, { getOwnWorkspace }) => {
         {
             title: 'Name',
             key: 'name',
-            dataIndex: 'name',
+            dataIndex: 'username',
+            render: (text, record) => {
+                return (
+                    <span>{record.user?.username}</span>
+                );
+            }
         },
         {
             title: 'Role',
             key: 'role',
             dataIndex: 'role',
+            render: (text, record) => {
+                return (
+                    <span>{text == 'ROLE_WORKSPACE_MANAGER' ? 'Manager' : 'Member'}</span>
+                );
+            }
         },
         {
             title: 'Email',
             key: 'email',
             dataIndex: 'email',
+            render: (text, record) => {
+                return (
+                    <span>{record.user?.email}</span>
+                );
+            }
         },
         {
             title: 'Action',
@@ -297,15 +338,17 @@ const Home = (props, { getOwnWorkspace }) => {
             render: () => {
                 return (
                     <span>
-                        <Tooltip
-                            title={'Remove'}
-                        >
-                            <UserDeleteOutlined
-                                className="icon_action"
-                                style={{ color: "#E74C3C", fontSize: 18 }}
-                                onClick={() => removeUser()}
-                            />
-                        </Tooltip>
+                        {query.get("type") == 'manager' &&
+                            <Tooltip
+                                title={'Remove'}
+                            >
+                                <UserDeleteOutlined
+                                    className="icon_action"
+                                    style={{ color: "#E74C3C", fontSize: 18 }}
+                                    onClick={() => removeUser()}
+                                />
+                            </Tooltip>
+                        }
                     </span>
                 );
             }
@@ -316,15 +359,19 @@ const Home = (props, { getOwnWorkspace }) => {
         <div style={{ height: 'calc(100vh - 46px)' }}>
             <PageHeader
                 title={workspaceDetail.name}
-                extra={[
-                    <Button type='primary' onClick={openModalInvite}>Invite</Button>,
-                    // <Button
-                    //     type="primary"
-                    //     onClick={openFormWorkspace}
-                    // >Create</Button>,
-                    <Button type="primary" onClick={editWorkspace}>Edit</Button>,
-                    <Button type="primary" onClick={deleteWorkspace}>Delete</Button>
-                ]}
+                extra={query.get("type") == 'manager' ?
+                    [
+                        <Button type='primary' onClick={openModalInvite}>Invite</Button>,
+                        // <Button
+                        //     type="primary"
+                        //     onClick={openFormWorkspace}
+                        // >Create</Button>,
+                        <Button type="primary" onClick={editWorkspace}>Edit</Button>,
+                        <Button type="primary" onClick={deleteWorkspace}>Delete</Button>
+                    ] : [
+                        <Button type="danger" onClick={leaveWorkspace}>Leave Workspace</Button>
+                    ]
+                }
             />
             <Card
                 bordered
@@ -339,7 +386,9 @@ const Home = (props, { getOwnWorkspace }) => {
                                 <Row>
                                     <Col span={20}></Col>
                                     <Col span={4} style={{ textAlign: 'right' }}>
-                                        <Button type='primary' onClick={openBoardModal}>Create Board</Button>
+                                        {query.get("type") == 'manager' &&
+                                            <Button type='primary' onClick={openBoardModal}>Create Board</Button>
+                                        }
                                     </Col>
                                 </Row>
                             }
@@ -382,7 +431,9 @@ const Home = (props, { getOwnWorkspace }) => {
                                 <Row>
                                     <Col span={20}></Col>
                                     <Col span={4} style={{ textAlign: 'right' }}>
-                                        <Button type='primary' >Invite</Button>
+                                        {query.get('type') == 'manager' &&
+                                            <Button type='primary' >Invite</Button>
+                                        }
                                     </Col>
                                 </Row>
                             }
