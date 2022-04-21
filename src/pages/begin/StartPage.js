@@ -10,52 +10,52 @@ import {
 } from 'antd';
 import { useHistory } from 'react-router-dom';
 
-const StartPage = () => {
+const StartPage = ({ listWorkspace, listOwnWorkspace }) => {
     const history = useHistory();
 
-    const [listWorkspace, setListWorkspace] = useState([]);
-    const [listOwnWorkspace, setListOwnWorkspace] = useState([]);
+    // const [listWorkspace, setListWorkspace] = useState([]);
+    // const [listOwnWorkspace, setListOwnWorkspace] = useState([]);
 
-    const getListWorkspace = () => {
-        axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
-            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
-            role: "ROLE_WORKSPACE_USER",
-            pageIndex: 0,
-            pageSize: 100,
-            status: 1
-        }).then(res => {
-            let listParentWp = [];
-            res.data.content.forEach(element => {
-                if (element.workSpace.parent == null) {
-                    listParentWp.push(element);
-                }
-            });
-            setListWorkspace(listParentWp);
-        })
-    }
+    // const getListWorkspace = () => {
+    //     axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
+    //         userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+    //         role: "ROLE_WORKSPACE_USER",
+    //         pageIndex: 0,
+    //         pageSize: 100,
+    //         status: 1
+    //     }).then(res => {
+    //         let listParentWp = [];
+    //         res.data.content.forEach(element => {
+    //             if (element.workSpace.parent == null) {
+    //                 listParentWp.push(element);
+    //             }
+    //         });
+    //         setListWorkspace(listParentWp);
+    //     })
+    // }
 
-    const getListOwnWorkspace = () => {
-        axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
-            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
-            role: "ROLE_WORKSPACE_MANAGER",
-            pageIndex: 0,
-            pageSize: 100,
-            status: 1
-        }).then(res => {
-            let listParentWp = [];
-            res.data.content.forEach(element => {
-                if (element.workSpace.parent == null) {
-                    listParentWp.push(element);
-                }
-            });
-            setListOwnWorkspace(listParentWp);
-        })
-    }
+    // const getListOwnWorkspace = () => {
+    //     axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
+    //         userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+    //         role: "ROLE_WORKSPACE_MANAGER",
+    //         pageIndex: 0,
+    //         pageSize: 100,
+    //         status: 1
+    //     }).then(res => {
+    //         let listParentWp = [];
+    //         res.data.content.forEach(element => {
+    //             if (element.workSpace.parent == null) {
+    //                 listParentWp.push(element);
+    //             }
+    //         });
+    //         setListOwnWorkspace(listParentWp);
+    //     })
+    // }
 
-    useEffect(() => {
-        getListWorkspace();
-        getListOwnWorkspace();
-    }, []);
+    // useEffect(() => {
+    //     getListWorkspace();
+    //     getListOwnWorkspace();
+    // }, []);
 
     const WorkspaceItem = (item, index) => {
         return (
@@ -97,7 +97,7 @@ const StartPage = () => {
                                     cursor: 'pointer'
                                 }}
                                 onClick={() => history.push(
-                                    '/workspace?id=' + item.workSpace.id,
+                                    '/workspace?id=' + item.workSpace.id + '&type=manager',
                                 )}
                             >
                                 <p style={{ fontWeight: 'bold', color: '#fff' }}>{item.workSpace.name}</p>
@@ -126,7 +126,7 @@ const StartPage = () => {
                                     cursor: 'pointer'
                                 }}
                                 onClick={() => history.push(
-                                    '/workspace?id=' + item.workSpace.id,
+                                    '/workspace?id=' + item.workSpace.id + '&type=user',
                                 )}
                             >
                                 <p style={{ fontWeight: 'bold', color: '#fff' }}>{item.workSpace.name}</p>

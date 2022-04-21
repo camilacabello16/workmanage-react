@@ -7,15 +7,25 @@ import {
     Col,
     Dropdown,
     Space,
-    Tooltip
+    Tooltip,
+    notification
 } from 'antd';
 import 'antd/dist/antd.css';
 import { BellOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import FormWorkspace from 'pages/workspace/FormWorkspace';
+import {
+    ROOT_API,
+    API_RECEIVE_NOTIFICATION,
+    API_WORKSPACE_USER_INVITE,
+    API_NOTIFICATION_DELETE,
+    API_WORKSPACE_USER
+} from '../constant/api';
+import axios from 'axios';
 
-const MenuLayout = ({ getOwnWorkspace }) => {
+const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
     const [visible, setVisible] = useState(false);
     const [isInsert, setIsInsert] = useState(true);
+    const [listNotification, setListNotification] = useState([]);
 
     const logout = () => {
         window.localStorage.removeItem('auth_user');
@@ -23,6 +33,16 @@ const MenuLayout = ({ getOwnWorkspace }) => {
         // window.localStorage.removeItem('jwt_token');
         window.location.href = '/login';
     }
+
+    const getNotification = () => {
+        axios.get(ROOT_API + API_RECEIVE_NOTIFICATION, { headers: { "Authorization": `Bearer ${window.localStorage.getItem('jwt_token')}` } }).then(res => {
+            setListNotification(res.data);
+        })
+    }
+
+    useEffect(() => {
+        getNotification();
+    }, []);
 
     const menuUser = (
         <Menu
@@ -75,77 +95,62 @@ const MenuLayout = ({ getOwnWorkspace }) => {
         </Menu>
     );
 
+    const deleteNoti = (id) => {
+        axios.delete(ROOT_API + API_RECEIVE_NOTIFICATION + '/' + id).then(res => {
+            getNotification();
+        })
+    }
+
+    const openNotificationWithIcon = (type, message, description) => {
+        notification[type]({
+            message: message,
+            description: description,
+        });
+    };
+
+    const acceptInvite = (workspaceId, notiId) => {
+        axios.put(ROOT_API + API_WORKSPACE_USER + '/invite/' + workspaceId + '/' + true).then(res => {
+            console.log(res);
+            openNotificationWithIcon('success', 'Join Workspace success');
+            deleteNoti(notiId);
+            getListWorkspace();
+            getNotification();
+        }).catch(err => {
+            openNotificationWithIcon('error', 'Join Workspace fail');
+        })
+    }
+
     const notificationList = (
         <Space style={{ width: 400 }}>
-            <Row style={{ width: '100%' }}>
-                <Col span={20}>
-                    Hiếu mời bạn vào workspace
-                </Col>
-                <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <Tooltip title="Đồng ý">
-                        <CheckCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#17A589'
-                            }}
-                        />
-                    </Tooltip>
-                    <Tooltip title="Từ chối">
-                        <CloseCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#E74C3C'
-                            }}
-                        />
-                    </Tooltip>
-                </Col>
-            </Row>
-            <Row style={{ width: '100%' }}>
-                <Col span={20}>
-                    Hiếu mời bạn vào workspace
-                </Col>
-                <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <Tooltip title="Đồng ý">
-                        <CheckCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#17A589'
-                            }}
-                        />
-                    </Tooltip>
-                    <Tooltip title="Từ chối">
-                        <CloseCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#E74C3C'
-                            }}
-                        />
-                    </Tooltip>
-                </Col>
-            </Row>
-            <Row style={{ width: '100%' }}>
-                <Col span={20}>
-                    Hiếu mời bạn vào workspace
-                </Col>
-                <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <Tooltip title="Đồng ý">
-                        <CheckCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#17A589'
-                            }}
-                        />
-                    </Tooltip>
-                    <Tooltip title="Từ chối">
-                        <CloseCircleOutlined
-                            style={{
-                                fontSize: 20,
-                                color: '#E74C3C'
-                            }}
-                        />
-                    </Tooltip>
-                </Col>
-            </Row>
+            {listNotification.map((item, index) => {
+                return (
+                    <Row style={{ width: '100%' }} key={index}>
+                        <Col span={20}>
+                            {item.notificationDto.content}
+                        </Col>
+                        <Col span={4} style={{ display: 'flex', justifyContent: 'space-around' }}>
+                            <Tooltip title="Đồng ý">
+                                <CheckCircleOutlined
+                                    style={{
+                                        fontSize: 20,
+                                        color: '#17A589'
+                                    }}
+                                    onClick={() => { acceptInvite(item.notificationDto.workspaceId, item.id) }}
+                                />
+                            </Tooltip>
+                            <Tooltip title="Từ chối">
+                                <CloseCircleOutlined
+                                    style={{
+                                        fontSize: 20,
+                                        color: '#E74C3C'
+                                    }}
+                                    onClick={() => deleteNoti(item.id)}
+                                />
+                            </Tooltip>
+                        </Col>
+                    </Row>
+                );
+            })}
         </Space >
     );
 
@@ -177,14 +182,33 @@ const MenuLayout = ({ getOwnWorkspace }) => {
                     </Col>
                     <Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
                         <Dropdown overlay={notificationList} trigger={['click']}>
-                            <BellOutlined
-                                style={{
-                                    fontSize: 20,
-                                    position: 'absolute',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)'
-                                }}
-                            />
+                            <div>
+                                <BellOutlined
+                                    style={{
+                                        fontSize: 20,
+                                        position: 'absolute',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)'
+                                    }}
+                                >
+                                </BellOutlined>
+                                {listNotification.length > 0 &&
+                                    <div
+                                        style={{
+                                            backgroundColor: 'red',
+                                            color: '#fff',
+                                            width: 20,
+                                            height: 20,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            borderRadius: 100,
+                                            marginTop: 20,
+                                            marginLeft: 9
+                                        }}
+                                    >1</div>
+                                }
+                            </div>
                         </Dropdown>
                     </Col>
                     <Col span={1}>
