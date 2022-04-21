@@ -32,3 +32,8 @@ export const API_TEMPLATE_CLONE = '/workspace/clone-template';
 
 //notification
 export const API_NOTIFICATION_DELETE = '/notification';
+
+//register
+export const API_RESGISTER = API_ENPOINT + '/oauth/register';
+export const API_CHECK_USERNAME = '/username/';
+export const API_CHECK_EMAIL = '/email?';
