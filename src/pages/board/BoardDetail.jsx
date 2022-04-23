@@ -34,6 +34,7 @@ import axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
 import FormBoard from './FormBoard';
 import moment from 'moment';
+import { FormItemStatusContext } from 'antd/lib/form/context';
 
 const { TabPane } = Tabs;
 
@@ -131,9 +132,13 @@ const BoardDetail = () => {
     const [visibleAddTemplate, setVisibleTemplate] = useState(false);
     const [listTemplate, setListTemplate] = useState([]);
     const [visibleCloneTemplate, setVisibleCloneTemplate] = useState(false);
+    const [listUserWorkspace, setListUserWorkspace] = useState([]);
 
     const getBoardDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
+            axios.get(ROOT_API + API_WORKSPACE + '/' + res?.data.parent?.id).then(resp => {
+                setListUserWorkspace(resp.data.workSpaceUsers);
+            })
             setBoardDetail(res.data);
             setBoardParentId(res.data.parent.id);
         })
@@ -275,10 +280,12 @@ const BoardDetail = () => {
 
     const onCloseTask = () => {
         setVisibleTask(false);
+        formTask.resetFields();
     }
 
     const onCloseCard = () => {
         setVisibleCard(false);
+        formCard.resetFields();
     }
 
     const openNotificationWithIcon = (type, message, description) => {
@@ -294,6 +301,9 @@ const BoardDetail = () => {
         }
         value.card = card;
         if (!isEditTask) {
+            value.user = {
+                id: value.user
+            }
             axios.post(ROOT_API + API_TASK, value).then(res => {
                 getTask();
                 getCard();
@@ -306,6 +316,9 @@ const BoardDetail = () => {
         }
         else {
             value.id = taskItemEdit.id;
+            value.user = {
+                id: value.user
+            }
             axios.put(ROOT_API + API_TASK + '/' + taskItemEdit.id, value).then(res => {
                 getTask();
                 openNotificationWithIcon('success', 'Update task success');
@@ -421,8 +434,9 @@ const BoardDetail = () => {
     const editTask = (item) => {
         formTask.setFieldsValue({
             name: item.name,
-            startDate: moment(item.startDate),
-            endDate: moment(item.endDate)
+            startDate: item.startDate ? moment(item.startDate) : null,
+            endDate: item.endDate ? moment(item.endDate) : null,
+            user: item.user.id
         });
         setInsertToCardId(item.card.id);
         setIsEditTask(true);
@@ -625,29 +639,42 @@ const BoardDetail = () => {
                                                                                                                                     justifyContent: 'space-between'
                                                                                                                                 }}
                                                                                                                             >
-                                                                                                                                <span
-                                                                                                                                    {...provided2.dragHandleProps}
+                                                                                                                                <div
                                                                                                                                     style={{
-                                                                                                                                        width: '100%'
+                                                                                                                                        display: 'flex',
+                                                                                                                                        flexDirection: 'column'
                                                                                                                                     }}
-                                                                                                                                >{item2.name}</span>
-                                                                                                                                <Tooltip title="Edit">
-                                                                                                                                    <EditOutlined
+                                                                                                                                >
+                                                                                                                                    <span
+                                                                                                                                        {...provided2.dragHandleProps}
                                                                                                                                         style={{
-                                                                                                                                            cursor: 'pointer'
+                                                                                                                                            width: '100%'
                                                                                                                                         }}
-                                                                                                                                        onClick={() => editTask(item2)}
-                                                                                                                                    />
-                                                                                                                                </Tooltip>
-                                                                                                                                <Tooltip title="Delete">
-                                                                                                                                    <DeleteOutlined
-                                                                                                                                        style={{
-                                                                                                                                            cursor: 'pointer',
-                                                                                                                                            marginLeft: 10
-                                                                                                                                        }}
-                                                                                                                                        onClick={() => deleteTask(item2.id)}
-                                                                                                                                    />
-                                                                                                                                </Tooltip>
+                                                                                                                                    >{item2.name}</span>
+                                                                                                                                    <span>
+                                                                                                                                        Assign: {item2.user?.username}
+                                                                                                                                    </span>
+                                                                                                                                </div>
+                                                                                                                                <div>
+                                                                                                                                    <Tooltip title="Edit">
+                                                                                                                                        <EditOutlined
+                                                                                                                                            style={{
+                                                                                                                                                cursor: 'pointer'
+                                                                                                                                            }}
+                                                                                                                                            onClick={() => editTask(item2)}
+                                                                                                                                        />
+                                                                                                                                    </Tooltip>
+                                                                                                                                    <Tooltip title="Delete">
+                                                                                                                                        <DeleteOutlined
+                                                                                                                                            style={{
+                                                                                                                                                cursor: 'pointer',
+                                                                                                                                                marginLeft: 10
+                                                                                                                                            }}
+                                                                                                                                            onClick={() => deleteTask(item2.id)}
+                                                                                                                                        />
+                                                                                                                                    </Tooltip>
+                                                                                                                                </div>
+
                                                                                                                             </div>
                                                                                                                         </div>
                                                                                                                     );
@@ -747,6 +774,26 @@ const BoardDetail = () => {
                                         return current && current < moment(customDate, "YYYY-MM-DD");
                                     }}
                                 />
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item
+                                name="user"
+                                label="Assign"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please enter task name'
+                                    }
+                                ]}
+                            >
+                                <Select>
+                                    {listUserWorkspace.map((item, index) => {
+                                        return (
+                                            <Select.Option key={index} value={item.user.id}>{item.user.username}</Select.Option>
+                                        );
+                                    })}
+                                </Select>
                             </Form.Item>
                         </Col>
                         <Col span={24}>

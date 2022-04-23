@@ -74,6 +74,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
     const [workspaceEdit, setWorkspaceEdit] = useState({});
     const [isInsert, setIsInsert] = useState(false);
     const [userNameInvite, setUserNameInvite] = useState('');
+    const [listUserData, setListUserData] = useState([]);
 
     const editWorkspace = () => {
         setWorkspaceEdit(workspaceDetail);
@@ -85,7 +86,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
             setWorkspaceDetail(res.data);
             setListBoard(res.data.childs);
-            setListUser(res.data.workSpaceUsers);
+            setListUserData(res.data.workSpaceUsers);
         })
     }
 
@@ -108,7 +109,6 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         // })
         getWorkspaceDetail();
         getUsers();
-        console.log(query.get("type"));
         // console.log(location);
     }, [query.get("id")])
 
@@ -126,14 +126,23 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         setVisibleModalInvite(true);
     }
 
-    const removeUser = () => {
+    const removeUser = (id) => {
         Modal.confirm({
             title: "Do you want remove this member?",
             okText: "Yes",
             okType: "danger",
             cancelText: "Cancel",
             onOk() {
-                console.log("Ok");
+                console.log(id);
+                axios.put(ROOT_API + API_WORKSPACE_USER_INVITE + '/' + id + '/' + false).then(res => {
+                    openNotificationWithIcon('success', 'Remove user success');
+                    getWorkspaceDetail();
+                }).catch(err => {
+                    console.log(err);
+                });
+                // getListWorkspace();
+                // getOwnWorkspace();
+                // history.push('/');
             },
             onCancel() { },
         });
@@ -335,7 +344,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         {
             title: 'Action',
             key: 'action',
-            render: () => {
+            render: (text, record) => {
                 return (
                     <span>
                         {query.get("type") == 'manager' &&
@@ -345,7 +354,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                                 <UserDeleteOutlined
                                     className="icon_action"
                                     style={{ color: "#E74C3C", fontSize: 18 }}
-                                    onClick={() => removeUser()}
+                                    onClick={() => removeUser(record.id)}
                                 />
                             </Tooltip>
                         }
@@ -440,7 +449,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                         >
                             <Table
                                 columns={columnUser}
-                                dataSource={listUser}
+                                dataSource={listUserData}
                             />
                         </Card>
                     </TabPane>
