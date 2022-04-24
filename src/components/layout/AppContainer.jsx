@@ -48,7 +48,7 @@ function AppContainer() {
 
     const getListWorkspace = () => {
         axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
-            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+            userId: JSON.parse(window.localStorage.getItem('auth_user'))?.id,
             role: "ROLE_WORKSPACE_USER",
             pageIndex: 0,
             pageSize: 100,
@@ -79,7 +79,7 @@ function AppContainer() {
             //   }
             //window.location.href = '/';
             let expireTime = window.localStorage.getItem('token_expire_time');
-            if (moment(expireTime) > moment()) {
+            if (moment(expireTime) < moment()) {
                 window.location.href = '/login';
             }
         } else {
