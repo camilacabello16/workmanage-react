@@ -35,7 +35,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import FormBoard from './FormBoard';
 import moment from 'moment';
 import { FormItemStatusContext } from 'antd/lib/form/context';
-
+import BoardStatistical from './BoardStatistical';
 const { TabPane } = Tabs;
 
 function useQuery() {
@@ -717,7 +717,11 @@ const BoardDetail = () => {
                                     <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => { setVisibleCard(true); setIsEditCard(false); }}>Add another list</Button>
                                 </div>
                             </TabPane>
-                            <TabPane tab="Statistical" key="2"></TabPane>
+                            <TabPane tab="Statistical" key="2">
+                                <BoardStatistical
+                                    currentBoardID={boardDetail.id}
+                                />
+                            </TabPane>
                         </Tabs>
                     </Card>
                 </Spin>
