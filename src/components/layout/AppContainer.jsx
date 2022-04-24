@@ -79,7 +79,7 @@ function AppContainer() {
             //   }
             //window.location.href = '/';
             let expireTime = window.localStorage.getItem('token_expire_time');
-            if (moment(expireTime) < moment()) {
+            if (moment(expireTime) > moment()) {
                 window.location.href = '/login';
             }
         } else {
@@ -87,6 +87,7 @@ function AppContainer() {
                 window.location.href = '/login';
             }
             window.localStorage.removeItem('iSignUp')
+            // window.location.href = '/login';
         }
     }, [])
 

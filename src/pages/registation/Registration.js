@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Row,
-    Col,
     Form,
     Input,
     Card,
@@ -10,20 +8,77 @@ import {
     Space
 } from 'antd';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
+import { API_RESGISTER, API_CHECK_EMAIL, API_CHECK_USERNAME } from 'components/constant/api';
 const Registration = () => {
+    var object = {};
+    let gotoLogin = false;
     const openNotificationWithIcon = (type, message, description) => {
         notification[type]({
             message: message,
             description: description,
         });
     };
+    useEffect(() => {
+        if (gotoLogin) {
+            window.location.href = '/login';
+        }
+    }, [])
+    const onCheckEmail = async (values) => {
+        let requestBody = 'email=' + values.email;
+        // console.log(API_RESGISTER + API_CHECK_EMAIL + requestBody);
+        const res = await axios.post(API_RESGISTER + API_CHECK_EMAIL, requestBody).then(response => {
+            if (!response.data) {
 
+                onCheckUserName(values);
+            }
+            else {
+                openNotificationWithIcon("error", "Email đã tồn tại");
+            }
+        }).catch(err => {
+            console.log(err);
+            openNotificationWithIcon("error", "Lỗi hệ thống(email)");
+        });
+    };
+    const onCheckUserName = async (values) => {
+        // console.log(API_RESGISTER + API_CHECK_USERNAME + values.userName);
+        const res = await axios.get(API_RESGISTER + API_CHECK_USERNAME + values.userName).then(response => {
+            if (!response.data) {
+
+                onFinish(values);
+            }
+            else {
+                openNotificationWithIcon("error", "Tên đã tồn tại");
+            }
+        }).catch(err => {
+            console.log(err);
+            openNotificationWithIcon("error", "Lỗi hệ thống(username)");
+        });
+    };
     const onFinish = (values) => {
-        console.log(values);
-        window.localStorage.setItem('user', JSON.stringify(values));
-        openNotificationWithIcon("success", "Registration success")
-        window.location.href = "/login";
+        object.roles = [{
+            id: 4,
+            name: "ROLE_USER",
+            description: null,
+            authority: "ROLE_USER"
+        }]
+        object.active = true;
+        object.email = values.email;
+        object.person = {
+            displayName: values.name,
+            gender: "M"
+        }
+        object.username = values.userName;
+        object.password = values.password;
+        axios.post(API_RESGISTER, object).then(response => {
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, [2000]);
+            openNotificationWithIcon("success", "Đăng kí thành công. Đăng nhập để tiếp tục!");
+        }).catch(err => {
+            console.log(err);
+            openNotificationWithIcon("error", "Lỗi hệ thống(aaaaaaa)");
+        });
     };
 
     return (
@@ -94,7 +149,7 @@ const Registration = () => {
                 bordered
             >
                 <Form
-                    onFinish={onFinish}
+                    onFinish={onCheckEmail}
                 >
                     <Form.Item
                         name="userName"
