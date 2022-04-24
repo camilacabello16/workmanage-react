@@ -75,6 +75,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
     const [isInsert, setIsInsert] = useState(false);
     const [userNameInvite, setUserNameInvite] = useState('');
     const [listUserData, setListUserData] = useState([]);
+    const [userType, setUserType] = useState('');
 
     const editWorkspace = () => {
         setWorkspaceEdit(workspaceDetail);
@@ -109,6 +110,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         // })
         getWorkspaceDetail();
         getUsers();
+        setUserType(query.get("type"));
         // console.log(location);
     }, [query.get("id")])
 
@@ -265,7 +267,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                                 className="icon_action"
                                 style={{ color: "#28a745", fontSize: 18 }}
                                 onClick={() => history.push(
-                                    '/board?id=' + record.id,
+                                    '/board?id=' + record.id + '&type=' + userType,
                                 )}
                             />
                         </Tooltip>
@@ -423,7 +425,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                                                 cursor: 'pointer'
                                             }}
                                             onClick={() => history.push(
-                                                '/board?id=' + item.id,
+                                                '/board?id=' + item.id + '&type=' + query.get("type"),
                                             )}
                                         >
                                             <p style={{ fontWeight: 'bold' }}>{item.name}</p>

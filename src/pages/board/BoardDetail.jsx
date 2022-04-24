@@ -436,7 +436,7 @@ const BoardDetail = () => {
             name: item.name,
             startDate: item.startDate ? moment(item.startDate) : null,
             endDate: item.endDate ? moment(item.endDate) : null,
-            user: item.user.id
+            user: item.user?.id
         });
         setInsertToCardId(item.card.id);
         setIsEditTask(true);
@@ -465,6 +465,7 @@ const BoardDetail = () => {
             onCloseTemplate();
             getCard();
             getTask();
+            getListTemplate();
             formTemplate.resetFields();
         }).catch(err => {
             openNotificationWithIcon('error', 'Create template fail');
@@ -514,7 +515,7 @@ const BoardDetail = () => {
 
                                 <Col span={6}></Col>
                                 <Col span={12} style={{ textAlign: 'right' }}>
-                                    <Button onClick={() => history.push('/workspace?id=' + boardParentId)} style={{ marginRight: 10 }}>Back</Button>
+                                    <Button onClick={() => history.push('/workspace?id=' + boardParentId + '&type=' + query.get("type"))} style={{ marginRight: 10 }}>Back</Button>
                                     {/* <Button>Invite</Button> */}
                                     <Button type='primary' style={{ marginLeft: 10 }} onClick={() => setVisibleFormBoard(true)}>Edit</Button>
                                     <Button type='primary' style={{ marginLeft: 10 }} onClick={deleteBoard}>Delete</Button>
