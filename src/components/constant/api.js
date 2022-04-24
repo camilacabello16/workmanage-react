@@ -16,6 +16,10 @@ export const API_CARD_UPDATE_VIEW = '/card/update-view';
 export const API_TASK = '/task';
 export const API_TASK_SEARCH = '/task/search';
 
+//statistical
+export const API_STATISTICA = '/dashboard/'
+export const API_STATISTICAL_TASK = '/dashboard/task/'
+export const API_STATISTICAL_MEMBER = '/dashboard/member/'
 //workspace user
 export const API_WORKSPACE_USER = '/workspace-user';
 export const API_WORKSPACE_USER_SEARCH = '/workspace-user/search';
