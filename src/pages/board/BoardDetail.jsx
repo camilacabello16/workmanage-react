@@ -133,6 +133,7 @@ const BoardDetail = () => {
     const [listTemplate, setListTemplate] = useState([]);
     const [visibleCloneTemplate, setVisibleCloneTemplate] = useState(false);
     const [listUserWorkspace, setListUserWorkspace] = useState([]);
+    const [keyTab, setKeyTab] = useState('');
 
     const getBoardDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
@@ -410,7 +411,7 @@ const BoardDetail = () => {
     }
 
     const callback = (key) => {
-        console.log(key);
+        setKeyTab(key);
     }
 
     const deleteCard = (id) => {
@@ -720,6 +721,7 @@ const BoardDetail = () => {
                             <TabPane tab="Statistical" key="2">
                                 <BoardStatistical
                                     currentBoardID={boardDetail.id}
+                                    activeKey={keyTab}
                                 />
                             </TabPane>
                         </Tabs>
