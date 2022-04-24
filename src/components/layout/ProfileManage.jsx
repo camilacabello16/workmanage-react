@@ -36,7 +36,7 @@ const ProfileManage = () => {
             form.setFieldsValue({
                 displayName: JSON.parse(userJSON).displayName,
                 email: JSON.parse(userJSON).email,
-                birthday: moment(JSON.parse(userJSON).dob)
+                birthday: JSON.parse(userJSON).dob ? moment(JSON.parse(userJSON).dob) : null
             })
             getData();
         } else {
@@ -109,145 +109,155 @@ const ProfileManage = () => {
     };
 
     return (
-        <Tabs defaultActiveKey={activeKey} onChange={(e) => setActiveKey(e)}>
-            <TabPane tab="Hồ sơ và hiển thị" key="1" >
-                <h3>Giới thiệu về bạn</h3>
-                <Card >
-                    <Form onFinish={onFinishTab1} form={form}>
-                        <Row>
-                            <Col span={4}>
-                                <span>Họ tên</span>
-                            </Col>
-                            <Col span={20} style={{ textAlign: 'right' }}>
-                                <p>Ai có thể thấy nội dung này?</p>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={8}>
-                                <Form.Item name="displayName" >
-                                    <Input style={{ width: '100%', textAlign: 'left' }}>
-                                    </Input>
-                                </Form.Item>
-                            </Col>
-                            <Col span={16} style={{ textAlign: 'right' }}>
-                                <Select style={{ width: '30%', textAlign: 'left' }} placeholder="Bất kỳ ai" disabled={true}
-                                >
-                                    <Option>
-                                        <DeleteOutlined style={{ marginRight: 5 }} />
-                                        <span style={{ marginTop: 50 }} >Mọi người</span>
-                                    </Option>
-                                    <Option>
-                                        <DeleteOutlined style={{ marginRight: 5 }} />
-                                        <span>Chỉ mình tôi</span>
-                                    </Option>
-                                </Select>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={12}>
-                                <span>Ngày sinh</span>
-                            </Col>
-                            <Col span={12} style={{ textAlign: 'right' }}>
-                                <p>Ai có thể thấy nội dung này?</p>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={8} >
-                                <Form.Item name="birthday" placeholder="Chọn ngày sinh">
-                                    <DatePicker />
-                                </Form.Item>
-                            </Col>
-                            <Col span={16} style={{ textAlign: 'right' }}>
-                                <Select style={{
-                                    width: '30%',
-                                    textAlign: 'left'
+        <Row>
+            <Col span={24}>
+                <Tabs
+                    defaultActiveKey={activeKey}
+                    onChange={(e) => setActiveKey(e)}
+                    style={{ padding: 10 }}
+                >
+                    <TabPane tab="Hồ sơ và hiển thị" key="1" >
+                        <h3>Giới thiệu về bạn</h3>
+                        <Card >
+                            <Form onFinish={onFinishTab1} form={form}>
+                                <Row>
+                                    <Col span={4}>
+                                        <span>Họ tên</span>
+                                    </Col>
+                                    <Col span={20} style={{ textAlign: 'right' }}>
+                                        <p>Ai có thể thấy nội dung này?</p>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col span={8}>
+                                        <Form.Item name="displayName" >
+                                            <Input style={{ width: '100%', textAlign: 'left' }}>
+                                            </Input>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={16} style={{ textAlign: 'right' }}>
+                                        <Select style={{ width: '30%', textAlign: 'left' }} placeholder="Bất kỳ ai" disabled={true}
+                                        >
+                                            <Option>
+                                                <DeleteOutlined style={{ marginRight: 5 }} />
+                                                <span style={{ marginTop: 50 }} >Mọi người</span>
+                                            </Option>
+                                            <Option>
+                                                <DeleteOutlined style={{ marginRight: 5 }} />
+                                                <span>Chỉ mình tôi</span>
+                                            </Option>
+                                        </Select>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col span={12}>
+                                        <span>Ngày sinh</span>
+                                    </Col>
+                                    <Col span={12} style={{ textAlign: 'right' }}>
+                                        <p>Ai có thể thấy nội dung này?</p>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col span={8} >
+                                        <Form.Item name="birthday" placeholder="Chọn ngày sinh">
+                                            <DatePicker />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={16} style={{ textAlign: 'right' }}>
+                                        <Select style={{
+                                            width: '30%',
+                                            textAlign: 'left'
+                                        }}
+                                            placeholder="Bất kỳ ai"
+                                            disabled={true}
+                                        >
+                                        </Select>
+                                    </Col>
+                                </Row>
+                                <Col span={4} style={{ marginTop: 30 }}>
+                                    <Button type="primary" htmlType="submit">
+                                        Lưu thay đổi
+                                    </Button>
+                                </Col>
+                            </Form>
+                        </Card>
+                    </TabPane>
+                    <TabPane tab="Email" key="2">
+                        <Form
+                            layout="vertical"
+                            autoComplete="off"
+                            style={{ width: '50%' }}
+                            onFinish={onFinishTab2}
+                            form={form}
+                        >
+                            <Form.Item
+                                name="email"
+                                rules={[
+                                    {
+                                        required: true,
+                                    },
+                                    {
+                                        type: 'email',
+                                        warningOnly: true,
+                                    },
+                                    {
+                                        type: 'string',
+                                    },
+                                ]}
+                            >
+                                <Input style={{ width: '100%', textAlign: 'left' }}>
+                                </Input>
+                            </Form.Item>
+                            <Form.Item>
+                                <Space>
+                                    <Button type="primary" htmlType="submit">
+                                        Lưu thay đổi
+                                    </Button>
+                                </Space>
+                            </Form.Item>
+                        </Form>
+                    </TabPane>
+                    <TabPane tab="Bảo mật" key="3">
+                        <Form
+                            name="basic"
+                            wrapperCol={{
+                                span: 8,
+                            }}
+                            initialValues={{
+                                remember: true,
+                            }}
+                            autoComplete="off"
+                            onFinish={onFinishTab3}
+                        >
+                            <Form.Item
+                                label="Mật khẩu mới*"
+                                name="newPassword"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Bạn chưa nhập mật khẩu mới',
+                                    },
+                                ]}
+                            >
+                                <Input.Password />
+                            </Form.Item>
+                            <Form.Item
+                                wrapperCol={{
+                                    offset: 0,
+                                    span: 8,
                                 }}
-                                    placeholder="Bất kỳ ai"
-                                    disabled={true}
-                                >
-                                </Select>
-                            </Col>
-                        </Row>
-                        <Col span={4} style={{ marginTop: 30 }}>
-                            <Button type="primary" htmlType="submit">
-                                Lưu thay đổi
-                            </Button>
-                        </Col>
-                    </Form>
-                </Card>
-            </TabPane>
-            <TabPane tab="Email" key="2">
-                <Form
-                    layout="vertical"
-                    autoComplete="off"
-                    style={{ width: '50%' }}
-                    onFinish={onFinishTab2}
-                    form={form}
-                >
-                    <Form.Item
-                        name="email"
-                        rules={[
-                            {
-                                required: true,
-                            },
-                            {
-                                type: 'email',
-                                warningOnly: true,
-                            },
-                            {
-                                type: 'string',
-                            },
-                        ]}
-                    >
-                        <Input style={{ width: '100%', textAlign: 'left' }}>
-                        </Input>
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" htmlType="submit">
-                                Lưu thay đổi
-                            </Button>
-                        </Space>
-                    </Form.Item>
-                </Form>
-            </TabPane>
-            <TabPane tab="Bảo mật" key="3">
-                <Form
-                    name="basic"
-                    wrapperCol={{
-                        span: 8,
-                    }}
-                    initialValues={{
-                        remember: true,
-                    }}
-                    autoComplete="off"
-                    onFinish={onFinishTab3}
-                >
-                    <Form.Item
-                        label="Mật khẩu mới*"
-                        name="newPassword"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Bạn chưa nhập mật khẩu mới',
-                            },
-                        ]}
-                    >
-                        <Input.Password />
-                    </Form.Item>
-                    <Form.Item
-                        wrapperCol={{
-                            offset: 0,
-                            span: 8,
-                        }}
-                    >
-                        <Button type="primary" htmlType="submit">
-                            Lưu thay đổi
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </TabPane>
-        </Tabs >
+                            >
+                                <Button type="primary" htmlType="submit">
+                                    Lưu thay đổi
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </TabPane>
+                </Tabs >
+            </Col>
+
+        </Row>
+
     );
 }
 

@@ -19,6 +19,7 @@ import {
 } from '../constant/api';
 import axios from 'axios';
 import StartPage from 'pages/begin/StartPage';
+import ProfileManage from './ProfileManage';
 
 const Home = lazy(() => import('components/home/Home'));
 const CustomHome = lazy(() => import('components/home/CustomHome'));
@@ -127,6 +128,9 @@ function AppContainer() {
                                 </Route>
                                 <Route exact path="/board">
                                     <BoardDetail />
+                                </Route>
+                                <Route exact path="/profile">
+                                    <ProfileManage />
                                 </Route>
                             </Suspense>
                         </Col>

@@ -21,11 +21,13 @@ import {
     API_WORKSPACE_USER
 } from '../constant/api';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
     const [visible, setVisible] = useState(false);
     const [isInsert, setIsInsert] = useState(true);
     const [listNotification, setListNotification] = useState([]);
+    const history = useHistory();
 
     const logout = () => {
         window.localStorage.removeItem('auth_user');
@@ -38,7 +40,7 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
         //window.localStorage.removeItem('auth_user');
         //window.localStorage.removeItem('token_expire_time');
         // window.localStorage.removeItem('jwt_token');
-        window.location.href = 'components/layout/ProfileManage';
+        history.push('profile');
     }
 
     const getNotification = () => {
