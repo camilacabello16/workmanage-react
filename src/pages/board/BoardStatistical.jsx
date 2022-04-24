@@ -54,6 +54,16 @@ const BoardStatistical = ({ currentBoardID }) => {
             description: description,
         });
     };
+
+    const getRandomColor = () => {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
     var rgb = ["maroon", "red", "purple", "fuchsia", "green", "lime", "olive", "yellow", "navy", "blue", "teal", "aqua", "black", "silver", "gray", "white"];
     return (
         <PieChart width={1000} height={400}>
@@ -68,7 +78,7 @@ const BoardStatistical = ({ currentBoardID }) => {
                 label
             >
                 {dataTask.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={rgb[index % rgb.length]} />
+                    <Cell key={`cell-${index}`} fill={getRandomColor()} />
                 ))}
             </Pie>
             <Pie
@@ -81,7 +91,7 @@ const BoardStatistical = ({ currentBoardID }) => {
                 fill="#82ca9d"
             >
                 {dataMember.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={rgb[index % rgb.length]} />
+                    <Cell key={`cell-${index}`} fill={getRandomColor()} />
                 ))}
             </Pie>
             <Tooltip />
