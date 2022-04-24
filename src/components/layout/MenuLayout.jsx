@@ -34,13 +34,21 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
         window.location.href = '/login';
     }
 
+    const profile = () => {
+        //window.localStorage.removeItem('auth_user');
+        //window.localStorage.removeItem('token_expire_time');
+        // window.localStorage.removeItem('jwt_token');
+        window.location.href = 'components/layout/ProfileManage';
+    }
+
     const getNotification = () => {
         axios.get(ROOT_API + API_RECEIVE_NOTIFICATION, { headers: { "Authorization": `Bearer ${window.localStorage.getItem('jwt_token')}` } }).then(res => {
             setListNotification(res.data);
         })
     }
-
+    let userJSON;
     useEffect(() => {
+        userJSON = window.localStorage.getItem('auth_user');
         getNotification();
     }, []);
 
@@ -82,11 +90,11 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                     </div>
                 </Col>
                 <Col span={18}>
-                    <span>Duc Hieu</span>
+                    <span>userK</span>
                     <p style={{ marginBottom: 0 }}>hieu@gmail.com</p>
                 </Col>
             </Row>
-            <Menu.Item>
+            <Menu.Item onClick={profile}>
                 Profile
             </Menu.Item>
             <Menu.Item onClick={logout}>
