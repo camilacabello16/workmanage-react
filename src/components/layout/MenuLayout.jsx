@@ -8,7 +8,8 @@ import {
     Dropdown,
     Space,
     Tooltip,
-    notification
+    notification,
+    Select
 } from 'antd';
 import 'antd/dist/antd.css';
 import { BellOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
@@ -18,7 +19,9 @@ import {
     API_RECEIVE_NOTIFICATION,
     API_WORKSPACE_USER_INVITE,
     API_NOTIFICATION_DELETE,
-    API_WORKSPACE_USER
+    API_WORKSPACE_USER,
+    API_WORKSPACE,
+    API_WORKSPACE_SEARCH
 } from '../constant/api';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
@@ -27,6 +30,8 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
     const [visible, setVisible] = useState(false);
     const [isInsert, setIsInsert] = useState(true);
     const [listNotification, setListNotification] = useState([]);
+    const [listWorkspace, setListWorkspace] = useState([]);
+
     const history = useHistory();
 
     const logout = () => {
@@ -48,10 +53,23 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
             setListNotification(res.data);
         })
     }
+
+    const getListWorkspace2 = () => {
+        axios.post(ROOT_API + API_WORKSPACE_SEARCH, {
+            pageSize: 1000,
+            pageIndex: 0,
+            userId: JSON.parse(window.localStorage.getItem('auth_user')).id
+        }).then(res => {
+            res.data.content = res.data.content.filter(o => o.parent == null);
+            setListWorkspace(res.data.content);
+        })
+    }
+
     let userJSON;
     useEffect(() => {
         userJSON = window.localStorage.getItem('auth_user');
         getNotification();
+        getListWorkspace2();
     }, []);
 
     const menuUser = (
@@ -173,14 +191,29 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                     }}
                 >
                     <Col span={8}>
-                        <Input.Search
+                        {/* <Input.Search
                             style={{
                                 position: 'absolute',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
                                 marginLeft: 10
                             }}
-                        />
+                        /> */}
+                        <Select
+                            placeholder="Tìm workspace"
+                            showSearch
+                            filterOption="children"
+                            style={{ width: '100%', marginLeft: 10 }}
+                            onChange={(e) => history.push('/workspace?id=' + e + '&type=manager')}
+                        >
+                            {listWorkspace.map((item, index) => {
+                                return (
+                                    <Select.Option value={item.id} key={index}>
+                                        {item.name}
+                                    </Select.Option>
+                                );
+                            })}
+                        </Select>
                     </Col>
                     <Col span={14}
                         style={{

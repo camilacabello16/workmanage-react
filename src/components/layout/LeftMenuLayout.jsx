@@ -4,7 +4,8 @@ import 'antd/dist/antd.css';
 import {
     PieChartOutlined,
     UnorderedListOutlined,
-    MenuOutlined
+    MenuOutlined,
+    TeamOutlined
 } from '@ant-design/icons';
 import {
     API_WORKSPACE_USER_GET_BY_USER,
@@ -124,6 +125,11 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
                     );
                 })}
             </SubMenu>
+            <Menu.Item icon={<TeamOutlined />}>
+                <Link to="/team" >
+                    Nhóm
+                </Link>
+            </Menu.Item>
         </Menu >
     );
 }
