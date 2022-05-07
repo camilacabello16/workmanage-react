@@ -115,10 +115,10 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                 </Col>
             </Row>
             <Menu.Item onClick={profile}>
-                Profile
+                Thông tin
             </Menu.Item>
             <Menu.Item onClick={logout}>
-                Logout
+                Đăng xuất
             </Menu.Item>
         </Menu>
     );
@@ -221,7 +221,7 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                             justifyContent: 'end'
                         }}
                     >
-                        <Button style={{ marginTop: 7 }} type="primary" onClick={() => setVisible(true)}>Create Workspace</Button>
+                        <Button style={{ marginTop: 7 }} type="primary" onClick={() => setVisible(true)}>Tạo không gian làm việc mới</Button>
                     </Col>
                     <Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
                         <Dropdown overlay={notificationList} trigger={['click']}>

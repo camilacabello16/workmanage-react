@@ -154,29 +154,29 @@ const Registration = () => {
                     <Form.Item
                         name="userName"
                         rules={[
-                            { required: true, message: 'Username is required' }
+                            { required: true, message: 'Tài khoản không được bỏ trống' }
                         ]}
                     >
                         <Input
                             style={{ width: '100%', padding: 8 }}
-                            placeholder="User Name"
+                            placeholder="Tài khoản"
                         />
                     </Form.Item>
                     <Form.Item
                         name="name"
                         rules={[
-                            { required: true, message: 'Display name is required' }
+                            { required: true, message: 'Tên không được bỏ trống' }
                         ]}
                     >
                         <Input
                             style={{ width: '100%', padding: 8 }}
-                            placeholder="Display Name"
+                            placeholder="Tên"
                         />
                     </Form.Item>
                     <Form.Item
                         name="email"
                         rules={[
-                            { required: true, message: 'Email is required' },
+                            { required: true, message: 'Email không được bỏ trống' },
                             { type: 'email' }
                         ]}
                     >
@@ -188,32 +188,32 @@ const Registration = () => {
                     <Form.Item
                         name="password"
                         rules={[
-                            { required: true, message: 'Password is required' }
+                            { required: true, message: 'Mật khẩu không được bỏ trống' }
                         ]}
                         style={{ marginTop: 10 }}
                     >
-                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Password" />
+                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Mật khẩu" />
                     </Form.Item>
                     <Form.Item
                         name="confirmPassword"
                         dependencies={['password']}
                         hasFeedback
                         rules={[
-                            { required: true, message: 'Confirm password is required' },
+                            { required: true, message: 'Trường này không được bỏ trống' },
                             ({ getFieldValue }) => ({
                                 validator(_, value) {
                                     if (!value || getFieldValue('password') === value) {
                                         return Promise.resolve();
                                     }
-                                    return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                                    return Promise.reject(new Error('Xác nhận mật khẩu không chính xác'));
                                 },
                             }),
                         ]}
                         style={{ marginTop: 10 }}
                     >
-                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Confirm password" />
+                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Xác nhận mật khẩu" />
                     </Form.Item>
-                    <p>Already have an account? <Link onClick={() => window.location.href = '/login'} >Log in</Link></p>
+                    <p>Bạn đã có tài khoản? <Link onClick={() => window.location.href = '/login'} >Đăng nhập ngay</Link></p>
                     <Button
                         type='primary'
                         htmlType='submit'

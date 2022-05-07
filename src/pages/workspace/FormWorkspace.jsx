@@ -75,7 +75,7 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
     return (
         <Drawer
             visible={visible}
-            title="Create Workspace"
+            title="Tạo không gian làm việc"
             onClose={onClose}
             width={'35%'}
             extra={
@@ -96,25 +96,25 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
             >
                 <Form.Item
                     name="name"
-                    label="Workspace name"
+                    label="Tên"
                     rules={[
-                        { required: true, message: 'Please enter workspace name' }
+                        { required: true, message: 'Vui lòng nhập tên của không gian' }
                     ]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="description"
-                    label="Description"
+                    label="Mô tả"
                     rules={[]}
                 >
                     <Input.TextArea />
                 </Form.Item>
                 <Form.Item
                     name="type"
-                    label="Type"
+                    label="Phân loại"
                     rules={[
-                        { required: true, message: 'Please choose type of workspace' }
+                        { required: true, message: 'Trường này không được bỏ trống' }
                     ]}
                 >
                     <Select
@@ -132,9 +132,9 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
                 </Form.Item>
                 <Form.Item
                     name="visibility"
-                    label="Visibility"
+                    label="Hiển thị"
                     rules={[
-                        { required: true, message: 'Please choose visibility' }
+                        { required: true, message: 'Trường này không được bỏ trống' }
                     ]}
                 >
                     <Select

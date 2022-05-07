@@ -318,7 +318,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
             render: (text, record) => {
                 return (
                     <span>
-                        <Tooltip title="Detail">
+                        <Tooltip title="Chi tiết">
                             <EyeOutlined
                                 className="icon_action"
                                 style={{ color: "#28a745", fontSize: 18 }}
@@ -327,7 +327,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                                 )}
                             />
                         </Tooltip>
-                        <Tooltip title="Invite">
+                        <Tooltip title="Mời">
                             <UserAddOutlined
                                 className="icon_action"
                                 style={{ color: "#F1C40F", fontSize: 18 }}
@@ -335,7 +335,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                             />
                         </Tooltip>
                         <Tooltip
-                            title={'Edit'}
+                            title={'Thay đổi'}
                         >
                             <EditOutlined
                                 className="icon_action"
@@ -348,7 +348,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                             />
                         </Tooltip>
                         <Tooltip
-                            title={'Delete'}
+                            title={'Xóa'}
                         >
                             <DeleteOutlined
                                 className="icon_action"
@@ -428,15 +428,15 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                 title={workspaceDetail.name}
                 extra={query.get("type") == 'manager' ?
                     [
-                        <Button type='primary' onClick={openModalInvite}>Invite</Button>,
+                        <Button type='primary' onClick={openModalInvite}>Mời</Button>,
                         // <Button
                         //     type="primary"
                         //     onClick={openFormWorkspace}
                         // >Create</Button>,
-                        <Button type="primary" onClick={editWorkspace}>Edit</Button>,
-                        <Button type="primary" onClick={deleteWorkspace}>Delete</Button>
+                        <Button type="primary" onClick={editWorkspace}>Thay đổi</Button>,
+                        <Button type="primary" onClick={deleteWorkspace}>Xóa</Button>
                     ] : [
-                        <Button type="danger" onClick={leaveWorkspace}>Leave Workspace</Button>
+                        <Button type="danger" onClick={leaveWorkspace}>Rời không gian</Button>
                     ]
                 }
             />
@@ -447,14 +447,14 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                 }}
             >
                 <Tabs defaultActiveKey={activeKey} onChange={(e) => setActiveKey(e)}>
-                    <TabPane tab="Boards" key="1">
+                    <TabPane tab="Bảng" key="1">
                         <Card
                             title={
                                 <Row>
                                     <Col span={20}></Col>
                                     <Col span={4} style={{ textAlign: 'right' }}>
                                         {query.get("type") == 'manager' &&
-                                            <Button type='primary' onClick={openBoardModal}>Create Board</Button>
+                                            <Button type='primary' onClick={openBoardModal}>Tạo bảng</Button>
                                         }
                                     </Col>
                                 </Row>
@@ -492,7 +492,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
 
                         </Card>
                     </TabPane>
-                    <TabPane tab="Member" key="2">
+                    <TabPane tab="Thành viên" key="2">
                         <Card
                             title={
                                 <Row>
@@ -533,7 +533,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
             />
             <Modal
                 visible={visibleModalInvite}
-                title="Invite Members"
+                title="Mời thêm thành viên"
                 onCancel={() => setVisibleModalInvite(false)}
                 footer={null}
             >
@@ -544,7 +544,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                                 <Select
                                     showSearch
                                     optionFilterProp="children"
-                                    placeholder="Select members"
+                                    placeholder="Chọn thành viên"
                                     style={{
                                         width: '100%'
                                     }}
