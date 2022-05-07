@@ -7,7 +7,8 @@ import {
     Button,
     notification,
     Row,
-    ConfigProvider
+    ConfigProvider,
+    Col,
 } from 'antd';
 import {
     ROOT_API,
@@ -20,7 +21,7 @@ import { useEffect, useState } from 'react';
 import { PieChart, Pie, Tooltip, Cell } from 'recharts';
 const { Option } = Select;
 
-const BoardStatistical = ({ currentBoardID }) => {
+const BoardStatistical = ({ currentBoardID, activeKey }) => {
     const [form] = Form.useForm();
     const layout = {
         labelCol: { span: 6 },
@@ -28,26 +29,37 @@ const BoardStatistical = ({ currentBoardID }) => {
     };
     const [dataTask, setDataTask] = useState([]);
     const [dataMember, setDataMember] = useState([]);
-    let data01 = [];
+
     let url01 = ROOT_API + API_STATISTICAL_MEMBER + currentBoardID;
     let url02 = ROOT_API + API_STATISTICAL_TASK + currentBoardID;
-    let data02 = [];
-    useEffect(() => {
+
+    const getStatisticCard = () => {
         axios.get(url01).then(res01 => {
+            let data01 = [];
             for (const [name, value] of Object.entries(res01.data)) {
                 data01.push({ name: name, value: value });
             }
             console.log(data01);
             setDataMember(data01);
-        })
+        });
+    };
+
+    const getStatisticMember = () => {
         axios.get(url02).then(res02 => {
+            let data02 = [];
             for (const [name, value] of Object.entries(res02.data)) {
                 data02.push({ name: name, value: value });
             }
             console.log(data02);
             setDataTask(data02);
-        })
-    }, [])
+        });
+    };
+
+    useEffect(() => {
+        getStatisticCard();
+        getStatisticMember();
+    }, [activeKey]);
+
     const openNotificationWithIcon = (type, message, description) => {
         notification[type]({
             message: message,
@@ -64,38 +76,98 @@ const BoardStatistical = ({ currentBoardID }) => {
         return color;
     }
 
+    const RADIAN = Math.PI / 180;
+
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+        return (
+            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                {`${(percent * 100).toFixed(0)}%`}
+            </text>
+        );
+    };
+
     var rgb = ["maroon", "red", "purple", "fuchsia", "green", "lime", "olive", "yellow", "navy", "blue", "teal", "aqua", "black", "silver", "gray", "white"];
     return (
-        <PieChart width={1000} height={400}>
-            <Pie
-                dataKey="value"
-                isAnimationActive={false}
-                data={dataTask}
-                cx={200}
-                cy={200}
-                outerRadius={80}
-                fill="#8884d8"
-                label
-            >
-                {dataTask.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={getRandomColor()} />
-                ))}
-            </Pie>
-            <Pie
-                dataKey="value"
-                data={dataMember}
-                cx={500}
-                cy={200}
-                innerRadius={40}
-                outerRadius={80}
-                fill="#82ca9d"
-            >
-                {dataMember.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={getRandomColor()} />
-                ))}
-            </Pie>
-            <Tooltip />
-        </PieChart>
+        <div
+            style={{
+                display: 'flex'
+            }}
+        >
+            <div>
+                <p style={{ fontSize: 20 }}>Thống kê số task của từng list</p>
+                <PieChart width={500} height={400}>
+                    <Pie
+                        dataKey="value"
+                        isAnimationActive={false}
+                        data={dataTask}
+                        cx={200}
+                        cy={200}
+                        label={renderCustomizedLabel}
+                        // outerRadius={120}
+                        labelLine={false}
+                    >
+                        {dataTask.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={getRandomColor()} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                </PieChart>
+            </div>
+            <div>
+                <p style={{ fontSize: 20 }}>Thống kê số task theo người làm</p>
+                <PieChart width={500} height={400}>
+                    <Pie
+                        dataKey="value"
+                        data={dataMember}
+                        cx={200}
+                        cy={200}
+                        // outerRadius={120}
+                        fill="#82ca9d"
+                        label={renderCustomizedLabel}
+                        labelLine={false}
+                        isAnimationActive={false}
+                    >
+                        {dataMember.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={getRandomColor()} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                </PieChart>
+            </div>
+        </div>
+        // {/* <Pie
+        //     dataKey="value"
+        //     isAnimationActive={false}
+        //     data={dataTask}
+        //     cx={200}
+        //     cy={200}
+        //     label={renderCustomizedLabel}
+        //     outerRadius={120}
+        //     labelLine={false}
+        // >
+        //     {dataTask.map((entry, index) => (
+        //         <Cell key={`cell-${index}`} fill={getRandomColor()} />
+        //     ))}
+        // </Pie> */}
+        // <Pie
+        //     dataKey="value"
+        //     data={dataMember}
+        //     cx={500}
+        //     cy={200}
+        //     outerRadius={120}
+        //     fill="#82ca9d"
+        //     label={renderCustomizedLabel}
+        //     labelLine={false}
+        // >
+        //     {dataMember.map((entry, index) => (
+        //         <Cell key={`cell-${index}`} fill={getRandomColor()} />
+        //     ))}
+        // </Pie>
+        // <Tooltip />
     );
 }
 

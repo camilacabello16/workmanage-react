@@ -33,7 +33,9 @@ import {
     ROOT_API,
     API_USER,
     API_WORKSPACE_USER,
-    API_WORKSPACE_USER_INVITE
+    API_WORKSPACE_USER_INVITE,
+    API_TEAM_SEARCH,
+    API_SEND_MAIL
 } from '../constant/api';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
@@ -76,6 +78,9 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
     const [userNameInvite, setUserNameInvite] = useState('');
     const [listUserData, setListUserData] = useState([]);
     const [userType, setUserType] = useState('');
+    const [listTeam, setListTeam] = useState([]);
+    const [keyUserTab, setKeyUserTab] = useState('1');
+    const [listUserByTeam, setListUserByTeam] = useState([]);
 
     const editWorkspace = () => {
         setWorkspaceEdit(workspaceDetail);
@@ -87,7 +92,17 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
             setWorkspaceDetail(res.data);
             setListBoard(res.data.childs);
-            setListUserData(res.data.workSpaceUsers);
+            setListUserData(res.data.workSpaceUsers.filter(o => o.status == 1));
+        })
+    }
+
+    const getListTeam = () => {
+        axios.post(ROOT_API + API_TEAM_SEARCH, {
+            pageIndex: 0,
+            pageSize: 100,
+            hostId: JSON.parse(window.localStorage.getItem('auth_user'))?.id
+        }).then(res => {
+            setListTeam(res.data.content);
         })
     }
 
@@ -110,6 +125,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
         // })
         getWorkspaceDetail();
         getUsers();
+        getListTeam();
         setUserType(query.get("type"));
         // console.log(location);
     }, [query.get("id")])
@@ -198,6 +214,13 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
             setVisibleModalInvite(false);
         }).catch(err => {
             openNotificationWithIcon('success', 'Invite member fail');
+        });
+        axios.post(ROOT_API + API_SEND_MAIL, {
+            managerName: JSON.parse(window.localStorage.getItem('auth_user')).username,
+            workspaceName: workspaceDetail.name,
+            emailReceiver: listUser.find(o => o.username == userNameInvite)?.email
+        }).then(res => {
+            console.log(res);
         })
     }
 
@@ -223,6 +246,39 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
             },
             onCancel() { },
         });
+    }
+
+    const setListInviteTeam = (e) => {
+        const user = listTeam.find(o => o.id == e).teamUsers.filter(o => o.user.id != JSON.parse(window.localStorage.getItem('auth_user')).id);
+        console.log(user);
+        const listUser = [];
+        user.forEach(e => {
+            listUser.push(e.user.username);
+        });
+        setListUserByTeam(listUser);
+        console.log(listUser);
+    }
+
+    const inviteTeam = () => {
+        listUserByTeam.forEach(e => {
+            axios.post(ROOT_API + API_WORKSPACE_USER + '/' + query.get("id") + '/' + e).then(res => {
+                openNotificationWithIcon('success', 'Invite member success');
+                setVisibleModalInvite(false);
+            }).catch(err => {
+                openNotificationWithIcon('success', 'Invite member fail');
+            });
+            axios.post(ROOT_API + API_SEND_MAIL, {
+                managerName: JSON.parse(window.localStorage.getItem('auth_user')).username,
+                workspaceName: workspaceDetail.name,
+                emailReceiver: listUser.find(o => o.username == e)?.email
+            }).then(res => {
+                console.log(res);
+            })
+        })
+    }
+
+    const callbackTab = (key) => {
+        setKeyUserTab(key);
     }
 
     const columnBoard = [
@@ -481,30 +537,61 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                 onCancel={() => setVisibleModalInvite(false)}
                 footer={null}
             >
-                <Row>
-                    <Col span={24}>
-                        <Select
-                            showSearch
-                            optionFilterProp="children"
-                            placeholder="Chọn thành viên"
-                            style={{
-                                width: '100%'
-                            }}
-                            allowClear
-                            onChange={(e) => { setUserNameInvite(e) }}
-                        >
-                            {listUser.map((item, index) => {
-                                return (
-                                    <Option key={index} value={item.username}>{item.username}</Option>
-                                );
-                            })}
-                        </Select>
-                    </Col>
-                    <Col span={24} style={{ marginTop: 10, display: 'flex', justifyContent: 'end' }}>
-                        <Button type='primary' onClick={inviteMember}>Mời</Button>
-                    </Col>
-                </Row>
-
+                <Tabs defaultActiveKey="1" onChange={callbackTab}>
+                    <TabPane key={"1"} tab="Mời người dùng">
+                        <Row>
+                            <Col span={24}>
+                                <Select
+                                    showSearch
+                                    optionFilterProp="children"
+                                    placeholder="Chọn thành viên"
+                                    style={{
+                                        width: '100%'
+                                    }}
+                                    allowClear
+                                    onChange={(e) => { setUserNameInvite(e) }}
+                                >
+                                    {listUser.map((item, index) => {
+                                        return (
+                                            <Option key={index} value={item.username}>{item.username}</Option>
+                                        );
+                                    })}
+                                </Select>
+                            </Col>
+                            <Col span={24} style={{ marginTop: 10, display: 'flex', justifyContent: 'end' }}>
+                                <Button type='primary' onClick={inviteMember}>Invite</Button>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane key={"2"} tab={"Mời theo nhóm"}>
+                        <Row>
+                            <Col span={24}>
+                                <Select
+                                    showSearch
+                                    optionFilterProp="children"
+                                    placeholder="Chọn nhóm"
+                                    style={{
+                                        width: '100%'
+                                    }}
+                                    allowClear
+                                    onChange={(e) => { setListInviteTeam(e) }}
+                                >
+                                    {listTeam.map((item, index) => {
+                                        return (
+                                            <Option key={index} value={item.id}>{item.name}</Option>
+                                        );
+                                    })}
+                                </Select>
+                            </Col>
+                            <Col span={24} style={{ marginTop: 10, display: 'flex', justifyContent: 'end' }}>
+                                <Button
+                                    type='primary'
+                                    onClick={inviteTeam}
+                                >Invite</Button>
+                            </Col>
+                        </Row>
+                    </TabPane>
+                </Tabs>
             </Modal>
         </div>
     );

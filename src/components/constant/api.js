@@ -45,3 +45,10 @@ export const API_CHECK_EMAIL = '/email?';
 //receive notification
 export const API_RECEIVE_NOTIFICATION = '/receiver-notification';
 
+//team
+export const API_TEAM = '/team';
+export const API_TEAM_SEARCH = '/team/search';
+
+//send mail
+export const API_SEND_MAIL = '/send-email';
+

@@ -28,7 +28,8 @@ import {
     API_CARD_UPDATE_VIEW,
     API_TEMPLATE,
     API_TEMPLATE_SEARCH,
-    API_TEMPLATE_CLONE
+    API_TEMPLATE_CLONE,
+    API_USER
 } from '../../components/constant/api';
 import axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -133,6 +134,9 @@ const BoardDetail = () => {
     const [listTemplate, setListTemplate] = useState([]);
     const [visibleCloneTemplate, setVisibleCloneTemplate] = useState(false);
     const [listUserWorkspace, setListUserWorkspace] = useState([]);
+    const [keyTab, setKeyTab] = useState('');
+    const [listUser, setListUser] = useState([]);
+    const [userId, setUserId] = useState(null);
 
     const getBoardDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
@@ -144,10 +148,17 @@ const BoardDetail = () => {
         })
     }
 
+    const getUsers = () => {
+        axios.get(ROOT_API + API_USER + '/1/1000', { headers: { "Authorization": `Bearer ${window.localStorage.getItem('jwt_token')}` } }).then(res => {
+            setListUser(res.data.content);
+        })
+    }
+
     useEffect(() => {
         getCard();
         getTask();
         getBoardDetail();
+        getUsers();
     }, [query.get("id")])
 
     const onCloseCloneTemplate = () => {
@@ -207,12 +218,17 @@ const BoardDetail = () => {
         axios.post(ROOT_API + API_TASK_SEARCH, {
             pageIndex: 0,
             pageSize: 1000,
-            workSpaceId: query.get("id")
+            workSpaceId: query.get("id"),
+            userId: userId
         }).then(res => {
             console.log(res);
             setListTask(res.data.content);
         })
     }
+
+    useEffect(() => {
+        getTask();
+    }, [userId]);
 
     useEffect(() => {
         getCard();
@@ -410,7 +426,7 @@ const BoardDetail = () => {
     }
 
     const callback = (key) => {
-        console.log(key);
+        setKeyTab(key);
     }
 
     const deleteCard = (id) => {
@@ -539,187 +555,208 @@ const BoardDetail = () => {
                     >
                         <Tabs defaultActiveKey="1" onChange={callback}>
                             <TabPane tab="Board" key="1">
-                                <div
-                                    style={{ display: 'flex' }}
-                                >
-                                    <DragDropContext
-                                        onDragEnd={result => onDragEnd(result)}
+                                <div>
+                                    <Row>
+                                        <Col span={6}>
+                                            <Select
+                                                placeholder="Giao cho"
+                                                style={{ width: '100%' }}
+                                                showSearch
+                                                filterOption="children"
+                                                onChange={(e) => setUserId(e)}
+                                            >
+                                                <Select.Option value={null}>Tất cả</Select.Option>
+                                                {listUser.map((item, index) => {
+                                                    return (
+                                                        <Select.Option key={index} value={item.id}>{item.username}</Select.Option>
+                                                    );
+                                                })}
+                                            </Select>
+                                        </Col>
+                                    </Row>
+                                    <div
+                                        style={{ display: 'flex', marginTop: 10 }}
                                     >
-                                        <Droppable droppableId='board' type='list' direction='horizontal'>
-                                            {(provided) => (
-                                                <div
-                                                    style={{
-                                                        display: 'flex',
-                                                    }}
-                                                    ref={provided.innerRef}
-                                                    {...provided.droppableProps}
-                                                >
-                                                    {listCard.map((item, index) => {
-                                                        return (
-                                                            <Draggable
-                                                                draggableId={item.id}
-                                                                index={index}
-                                                                key={item.id}
-                                                            >
-                                                                {(provided) => (
-                                                                    <div
-                                                                        style={{
-                                                                            marginRight: 10,
-                                                                            backgroundColor: '#000'
-                                                                        }}
-                                                                        key={index}
-                                                                        ref={provided.innerRef}
-                                                                        {...provided.draggableProps}
-                                                                    >
-                                                                        <div style={{ display: 'flex', width: '90%', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                                            <h5 {...provided.dragHandleProps}>{item.name} <span style={{ fontWeight: '400!important', fontSize: 14 }}>({item.numberTask ? item.numberTask : 0})</span></h5>
-
-                                                                            <Dropdown
-                                                                                trigger={['click']}
-                                                                                overlay={
-                                                                                    <Menu>
-                                                                                        <Menu.Item key="1" onClick={() => editCard(item)}>Edit</Menu.Item>
-                                                                                        <Menu.Item key="2" onClick={() => deleteCard(item.id)}>Delete</Menu.Item>
-                                                                                    </Menu>
-                                                                                }
-                                                                            >
-                                                                                <EllipsisOutlined />
-                                                                            </Dropdown>
-                                                                        </div>
+                                        <DragDropContext
+                                            onDragEnd={result => onDragEnd(result)}
+                                        >
+                                            <Droppable droppableId='board' type='list' direction='horizontal'>
+                                                {(provided) => (
+                                                    <div
+                                                        style={{
+                                                            display: 'flex',
+                                                        }}
+                                                        ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                    >
+                                                        {listCard.map((item, index) => {
+                                                            return (
+                                                                <Draggable
+                                                                    draggableId={item.id}
+                                                                    index={index}
+                                                                    key={item.id}
+                                                                >
+                                                                    {(provided) => (
                                                                         <div
                                                                             style={{
                                                                                 marginRight: 10,
+                                                                                backgroundColor: '#000'
                                                                             }}
+                                                                            key={index}
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
                                                                         >
-                                                                            <Droppable droppableId={item.id}>
-                                                                                {(provided1, snapshot) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            {...provided1.droppableProps}
-                                                                                            ref={provided1.innerRef}
-                                                                                            style={{
-                                                                                                background: snapshot.isDraggingOver
-                                                                                                    ? "lightblue"
-                                                                                                    : "lightgrey",
-                                                                                                padding: 4,
-                                                                                                width: 250,
-                                                                                                minHeight: 300,
-                                                                                                position: 'relative',
-                                                                                                paddingBottom: 40
-                                                                                            }}
-                                                                                        >
-                                                                                            {listTask.map((item2, index) => {
-                                                                                                return (
-                                                                                                    <span>
-                                                                                                        {item2?.card?.id == item?.id &&
-                                                                                                            <Draggable
-                                                                                                                key={item2.id}
-                                                                                                                draggableId={item2.id}
-                                                                                                                index={index}
-                                                                                                            >
-                                                                                                                {(provided2, snapshot) => {
-                                                                                                                    return (
-                                                                                                                        <div
-                                                                                                                            ref={provided2.innerRef}
-                                                                                                                            {...provided2.draggableProps}
-                                                                                                                            style={{
-                                                                                                                                userSelect: "none",
-                                                                                                                                padding: 10,
-                                                                                                                                margin: "0 0 8px 0",
-                                                                                                                                backgroundColor: snapshot.isDragging
-                                                                                                                                    ? "#0b806c"
-                                                                                                                                    : "#17A589",
-                                                                                                                                color: "white",
-                                                                                                                                ...provided2.draggableProps.style
-                                                                                                                            }}
-                                                                                                                        >
+                                                                            <div style={{ display: 'flex', width: '90%', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                <h5 {...provided.dragHandleProps}>{item.name} <span style={{ fontWeight: '400!important', fontSize: 14 }}>({item.numberTask ? item.numberTask : 0})</span></h5>
+
+                                                                                <Dropdown
+                                                                                    trigger={['click']}
+                                                                                    overlay={
+                                                                                        <Menu>
+                                                                                            <Menu.Item key="1" onClick={() => editCard(item)}>Edit</Menu.Item>
+                                                                                            <Menu.Item key="2" onClick={() => deleteCard(item.id)}>Delete</Menu.Item>
+                                                                                        </Menu>
+                                                                                    }
+                                                                                >
+                                                                                    <EllipsisOutlined />
+                                                                                </Dropdown>
+                                                                            </div>
+                                                                            <div
+                                                                                style={{
+                                                                                    marginRight: 10,
+                                                                                }}
+                                                                            >
+                                                                                <Droppable droppableId={item.id}>
+                                                                                    {(provided1, snapshot) => {
+                                                                                        return (
+                                                                                            <div
+                                                                                                {...provided1.droppableProps}
+                                                                                                ref={provided1.innerRef}
+                                                                                                style={{
+                                                                                                    background: snapshot.isDraggingOver
+                                                                                                        ? "lightblue"
+                                                                                                        : "lightgrey",
+                                                                                                    padding: 4,
+                                                                                                    width: 250,
+                                                                                                    minHeight: 300,
+                                                                                                    position: 'relative',
+                                                                                                    paddingBottom: 40
+                                                                                                }}
+                                                                                            >
+                                                                                                {listTask.map((item2, index) => {
+                                                                                                    return (
+                                                                                                        <span>
+                                                                                                            {item2?.card?.id == item?.id &&
+                                                                                                                <Draggable
+                                                                                                                    key={item2.id}
+                                                                                                                    draggableId={item2.id}
+                                                                                                                    index={index}
+                                                                                                                >
+                                                                                                                    {(provided2, snapshot) => {
+                                                                                                                        return (
                                                                                                                             <div
+                                                                                                                                ref={provided2.innerRef}
+                                                                                                                                {...provided2.draggableProps}
                                                                                                                                 style={{
-                                                                                                                                    display: 'flex',
-                                                                                                                                    alignItems: 'center',
-                                                                                                                                    justifyContent: 'space-between'
+                                                                                                                                    userSelect: "none",
+                                                                                                                                    padding: 10,
+                                                                                                                                    margin: "0 0 8px 0",
+                                                                                                                                    backgroundColor: snapshot.isDragging
+                                                                                                                                        ? "#0b806c"
+                                                                                                                                        : "#17A589",
+                                                                                                                                    color: "white",
+                                                                                                                                    ...provided2.draggableProps.style
                                                                                                                                 }}
                                                                                                                             >
                                                                                                                                 <div
                                                                                                                                     style={{
                                                                                                                                         display: 'flex',
-                                                                                                                                        flexDirection: 'column'
+                                                                                                                                        alignItems: 'center',
+                                                                                                                                        justifyContent: 'space-between'
                                                                                                                                     }}
                                                                                                                                 >
-                                                                                                                                    <span
-                                                                                                                                        {...provided2.dragHandleProps}
+                                                                                                                                    <div
                                                                                                                                         style={{
-                                                                                                                                            width: '100%'
+                                                                                                                                            display: 'flex',
+                                                                                                                                            flexDirection: 'column'
                                                                                                                                         }}
-                                                                                                                                    >{item2.name}</span>
-                                                                                                                                    <span>
-                                                                                                                                        Assign: {item2.user?.username}
-                                                                                                                                    </span>
-                                                                                                                                </div>
-                                                                                                                                <div>
-                                                                                                                                    <Tooltip title="Edit">
-                                                                                                                                        <EditOutlined
+                                                                                                                                    >
+                                                                                                                                        <span
+                                                                                                                                            {...provided2.dragHandleProps}
                                                                                                                                             style={{
-                                                                                                                                                cursor: 'pointer'
+                                                                                                                                                width: '100%'
                                                                                                                                             }}
-                                                                                                                                            onClick={() => editTask(item2)}
-                                                                                                                                        />
-                                                                                                                                    </Tooltip>
-                                                                                                                                    <Tooltip title="Delete">
-                                                                                                                                        <DeleteOutlined
-                                                                                                                                            style={{
-                                                                                                                                                cursor: 'pointer',
-                                                                                                                                                marginLeft: 10
-                                                                                                                                            }}
-                                                                                                                                            onClick={() => deleteTask(item2.id)}
-                                                                                                                                        />
-                                                                                                                                    </Tooltip>
-                                                                                                                                </div>
+                                                                                                                                        >{item2.name}</span>
+                                                                                                                                        <span>
+                                                                                                                                            Assign: {item2.user?.username}
+                                                                                                                                        </span>
+                                                                                                                                    </div>
+                                                                                                                                    <div>
+                                                                                                                                        <Tooltip title="Edit">
+                                                                                                                                            <EditOutlined
+                                                                                                                                                style={{
+                                                                                                                                                    cursor: 'pointer'
+                                                                                                                                                }}
+                                                                                                                                                onClick={() => editTask(item2)}
+                                                                                                                                            />
+                                                                                                                                        </Tooltip>
+                                                                                                                                        <Tooltip title="Delete">
+                                                                                                                                            <DeleteOutlined
+                                                                                                                                                style={{
+                                                                                                                                                    cursor: 'pointer',
+                                                                                                                                                    marginLeft: 10
+                                                                                                                                                }}
+                                                                                                                                                onClick={() => deleteTask(item2.id)}
+                                                                                                                                            />
+                                                                                                                                        </Tooltip>
+                                                                                                                                    </div>
 
+                                                                                                                                </div>
                                                                                                                             </div>
-                                                                                                                        </div>
-                                                                                                                    );
-                                                                                                                }}
-                                                                                                            </Draggable>
-                                                                                                        }
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                </Draggable>
+                                                                                                            }
 
-                                                                                                    </span>
+                                                                                                        </span>
 
-                                                                                                );
-                                                                                            })}
-                                                                                            {provided1.placeholder}
-                                                                                            <Button
-                                                                                                style={{
-                                                                                                    width: '96.5%',
-                                                                                                    position: 'absolute',
-                                                                                                    bottom: 5
-                                                                                                }}
-                                                                                                className='button-icon'
-                                                                                                icon={<PlusOutlined></PlusOutlined>}
-                                                                                                onClick={() => { insertTask(item.id); setIsEditTask(false); }}
-                                                                                            >Add a card</Button>
-                                                                                        </div>
-                                                                                    );
-                                                                                }}
-                                                                            </Droppable>
+                                                                                                    );
+                                                                                                })}
+                                                                                                {provided1.placeholder}
+                                                                                                <Button
+                                                                                                    style={{
+                                                                                                        width: '96.5%',
+                                                                                                        position: 'absolute',
+                                                                                                        bottom: 5
+                                                                                                    }}
+                                                                                                    className='button-icon'
+                                                                                                    icon={<PlusOutlined></PlusOutlined>}
+                                                                                                    onClick={() => { insertTask(item.id); setIsEditTask(false); }}
+                                                                                                >Add a card</Button>
+                                                                                            </div>
+                                                                                        );
+                                                                                    }}
+                                                                                </Droppable>
 
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                )}
-                                                            </Draggable>
-                                                        );
-                                                    })}
-                                                    {provided.placeholder}
-                                                </div>
-                                            )}
-                                        </Droppable>
-                                    </DragDropContext>
-                                    <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => { setVisibleCard(true); setIsEditCard(false); }}>Add another list</Button>
+                                                                    )}
+                                                                </Draggable>
+                                                            );
+                                                        })}
+                                                        {provided.placeholder}
+                                                    </div>
+                                                )}
+                                            </Droppable>
+                                        </DragDropContext>
+                                        <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => { setVisibleCard(true); setIsEditCard(false); }}>Add another list</Button>
+                                    </div>
                                 </div>
                             </TabPane>
                             <TabPane tab="Statistical" key="2">
                                 <BoardStatistical
                                     currentBoardID={boardDetail.id}
+                                    activeKey={keyTab}
                                 />
                             </TabPane>
                         </Tabs>
