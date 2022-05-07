@@ -68,7 +68,7 @@ const FormBoard = ({ visible, setVisibleBoardModal, getWorkspaceDetail, parentId
         <Modal
             visible={visible}
             onCancel={() => setVisibleBoardModal(false)}
-            title="Create Board"
+            title="Tạo bảng"
             footer={null}
         >
             <Form
@@ -79,25 +79,25 @@ const FormBoard = ({ visible, setVisibleBoardModal, getWorkspaceDetail, parentId
             >
                 <Form.Item
                     name="name"
-                    label="Board name"
+                    label="Tên bảng"
                     rules={[
-                        { required: true, message: 'Please enter board name' }
+                        { required: true, message: 'Vui lòng nhập tên của bảng' }
                     ]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="description"
-                    label="Description"
+                    label="Mô tả"
                     rules={[]}
                 >
                     <Input.TextArea />
                 </Form.Item>
                 <Form.Item
                     name="visibility"
-                    label="Visibility"
+                    label="Hiển thị"
                     rules={[
-                        { required: true, message: 'Please choose visibility' }
+                        { required: true, message: 'Trường này không được bỏ trống' }
                     ]}
                 >
                     <Select

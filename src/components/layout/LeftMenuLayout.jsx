@@ -84,7 +84,7 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
             {/* <Menu.Item key="1" icon={<PieChartOutlined />}>
                 Boards
             </Menu.Item> */}
-            <SubMenu key="sub2" icon={<MenuOutlined />} title="My Workspaces">
+            <SubMenu key="sub2" icon={<MenuOutlined />} title="Không gian làm việc của tôi">
                 {listWorkspaceOwn.map((item, index) => {
                     return (
                         <Menu.Item key={index}>
@@ -108,7 +108,7 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
                     );
                 })}
             </SubMenu>
-            <SubMenu key="sub1" icon={<UnorderedListOutlined />} title="Workspaces">
+            <SubMenu key="sub1" icon={<UnorderedListOutlined />} title="Không gian làm việc">
 
                 {/* <Menu.Item key="5">Option 5</Menu.Item>
                 <Menu.Item key="6">Option 6</Menu.Item>

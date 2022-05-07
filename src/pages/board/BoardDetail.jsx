@@ -878,7 +878,7 @@ const BoardDetail = () => {
                 </Form>
             </Modal>
             <Modal
-                title="Create Board"
+                title="Tạo bảng"
                 visible={visibleCloneTemplate}
                 onCancel={onCloseCloneTemplate}
                 footer={null}

@@ -136,7 +136,7 @@ const Login = () => {
                     style={{
                         fontSize: 20
                     }}
-                >Welcome to joinco.com</p>
+                >Chào mừng đến với Joinco</p>
             </Space>
             <Card
                 style={{
@@ -159,24 +159,24 @@ const Login = () => {
                     <Form.Item
                         name="userName"
                         rules={[
-                            { required: true, message: 'Username is required' }
+                            { required: true, message: 'Tài khoản không được để trống' }
                         ]}
                     >
                         <Input
                             style={{ width: '100%', padding: 8 }}
-                            placeholder="User Name"
+                            placeholder="Tài khoản"
                         />
                     </Form.Item>
                     <Form.Item
                         name="password"
                         rules={[
-                            { required: true, message: 'Password is required' }
+                            { required: true, message: 'Mật khẩu không được để trống' }
                         ]}
                         style={{ marginTop: 10 }}
                     >
-                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Password" />
+                        <Input type={"password"} style={{ width: '100%', padding: 8 }} placeholder="Mật khẩu" />
                     </Form.Item>
-                    <p>Don't have an account yet? <Link to={"/registration"} onClick={() => window.localStorage.setItem('isSignUp', true)}>Sign up</Link></p>
+                    <p>Chưa có tài khoản? <Link to={"/registration"} onClick={() => window.localStorage.setItem('isSignUp', true)}>Đăng ký ngay</Link></p>
                     <Button
                         type='primary'
                         htmlType='submit'
@@ -186,7 +186,7 @@ const Login = () => {
                             // borderColor: '#17A589',
                             height: 40
                         }}
-                    >Log In</Button>
+                    >Đăng nhập</Button>
                 </Form>
             </Card>
         </div>

@@ -32,7 +32,7 @@ const ProfileManage = () => {
     useEffect(() => {
         userJSON = window.localStorage.getItem('auth_user');
         if (userJSON && userJSON != '') {
-            openNotificationWithIcon("success", "Username or password correct");
+            openNotificationWithIcon("success", "Lỗi hệ thống('')");
             form.setFieldsValue({
                 displayName: JSON.parse(userJSON).displayName,
                 email: JSON.parse(userJSON).email,
@@ -40,7 +40,7 @@ const ProfileManage = () => {
             })
             getData();
         } else {
-            openNotificationWithIcon("error", "Username or password wrong");
+            openNotificationWithIcon("error", "Lỗi hệ thống('')");
         }
     }, [])
     const getData = () => {
@@ -160,7 +160,7 @@ const ProfileManage = () => {
                                 <Row>
                                     <Col span={8} >
                                         <Form.Item name="birthday" placeholder="Chọn ngày sinh">
-                                            <DatePicker />
+                                            <DatePicker placeholder="Chọn ngày sinh" />
                                         </Form.Item>
                                     </Col>
                                     <Col span={16} style={{ textAlign: 'right' }}>
@@ -195,6 +195,7 @@ const ProfileManage = () => {
                                 rules={[
                                     {
                                         required: true,
+                                        message: 'Bạn chưa nhập email mới',
                                     },
                                     {
                                         type: 'email',

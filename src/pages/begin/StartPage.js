@@ -79,7 +79,7 @@ const StartPage = ({ listWorkspace, listOwnWorkspace }) => {
     return (
         <div>
             <Card
-                title="My Workspace"
+                title="Không gian làm việc của bạn"
             >
                 <div
                     style={{
@@ -108,7 +108,7 @@ const StartPage = ({ listWorkspace, listOwnWorkspace }) => {
 
             </Card>
             <Card
-                title="Workspace"
+                title="Không gian làm việc"
             >
                 <div
                     style={{
