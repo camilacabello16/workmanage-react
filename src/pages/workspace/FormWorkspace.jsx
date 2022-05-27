@@ -54,7 +54,7 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
             values.userIdHost = JSON.parse(window.localStorage.getItem('auth_user')).id;
             if (isInsert) {
                 axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
-                    openNotificationWithIcon('success', 'Create success');
+                    openNotificationWithIcon('success', 'Tạo không gian làm việc thành công');
                     // onClose();
                     getOwnWorkspace();
                     setIsVisible(false);
@@ -62,7 +62,7 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
             } else {
                 values.id = workspaceEdit.id;
                 axios.put(ROOT_API + API_WORKSPACE + '/' + workspaceEdit.id, values).then(res => {
-                    openNotificationWithIcon('success', 'Update success');
+                    openNotificationWithIcon('success', 'Cập nhật không gian làm việc thành công');
                     getWorkspaceDetail();
                     getOwnWorkspace();
                     setIsVisible(false);
@@ -140,8 +140,8 @@ const FormWorkspace = ({ visible, setIsVisible, workspaceEdit, getWorkspaceDetai
                     <Select
                         placeholder=""
                     >
-                        <Option key={1} value={1}>Private</Option>
-                        <Option key={2} value={2}>Public</Option>
+                        <Option key={1} value={1}>Riêng tư</Option>
+                        <Option key={2} value={2}>Công khai</Option>
                     </Select>
                 </Form.Item>
                 {/* <Form.Item

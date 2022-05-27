@@ -146,14 +146,14 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
 
     const removeUser = (id) => {
         Modal.confirm({
-            title: "Do you want remove this member?",
+            title: "Bạn có muốn loại thành viên này không?",
             okText: "Yes",
             okType: "danger",
             cancelText: "Cancel",
             onOk() {
                 console.log(id);
                 axios.put(ROOT_API + API_WORKSPACE_USER_INVITE + '/' + id + '/' + false).then(res => {
-                    openNotificationWithIcon('success', 'Remove user success');
+                    openNotificationWithIcon('success', 'Loại thành viên thành công');
                     getWorkspaceDetail();
                 }).catch(err => {
                     console.log(err);
@@ -175,13 +175,13 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
 
     const deleteBoard = (id) => {
         Modal.confirm({
-            title: "Do you want delete this board?",
+            title: "Bạn có muốn xóa bảng này không?",
             okText: "Yes",
             okType: "danger",
             cancelText: "Cancel",
             onOk() {
                 axios.delete(ROOT_API + API_WORKSPACE + '/' + id).then(res => {
-                    openNotificationWithIcon('success', 'Delete success');
+                    openNotificationWithIcon('success', 'Xóa thành công');
                     getWorkspaceDetail();
                 })
             },
@@ -191,17 +191,19 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
 
     const deleteWorkspace = () => {
         Modal.confirm({
-            title: "Do you want delete this workspace?",
+            title: "Bạn có muốn xóa không gian làm việc này không?",
             okText: "Yes",
             okType: "danger",
             cancelText: "Cancel",
             onOk() {
                 axios.delete(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
-                    openNotificationWithIcon('success', 'Delete success');
+                    openNotificationWithIcon('success', 'Xóa thành công');
                     getOwnWorkspace();
                     history.push('/');
                 }).catch(err => {
-                    openNotificationWithIcon('error', 'Delete fail');
+                    getOwnWorkspace();
+                    history.push('/');
+                    // openNotificationWithIcon('error', 'Có lỗi xảy ra');
                 })
             },
             onCancel() { },
@@ -210,10 +212,10 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
 
     const inviteMember = () => {
         axios.post(ROOT_API + API_WORKSPACE_USER + '/' + query.get("id") + '/' + userNameInvite).then(res => {
-            openNotificationWithIcon('success', 'Invite member success');
+            openNotificationWithIcon('success', 'Mời thành viên thành công');
             setVisibleModalInvite(false);
         }).catch(err => {
-            openNotificationWithIcon('success', 'Invite member fail');
+            openNotificationWithIcon('success', 'Có lỗi xảy ra');
         });
         axios.post(ROOT_API + API_SEND_MAIL, {
             managerName: JSON.parse(window.localStorage.getItem('auth_user')).username,
@@ -225,17 +227,17 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
     }
 
     const leaveWorkspace = () => {
-        var workspaceUserId = listUser.find(o => o.user.id == JSON.parse(window.localStorage.getItem('auth_user')).id).id;
+        var workspaceUserId = listUser.find(o => o.user.id == JSON.parse(window.localStorage.getItem('auth_user')).id)?.id;
 
         Modal.confirm({
-            title: "Do you want leave this workspace?",
+            title: "Bạn có muốn rời khỏi không gian làm việc này không?",
             okText: "Yes",
             okType: "danger",
             cancelText: "Cancel",
             onOk() {
                 axios.put(ROOT_API + API_WORKSPACE_USER_INVITE + '/' + workspaceUserId + '/' + false).then(res => {
 
-                    openNotificationWithIcon('success', 'Leave workspace');
+                    openNotificationWithIcon('success', 'Đã rời khỏi không gian làm việc');
                 }).catch(err => {
                     console.log(err);
                 });
@@ -262,10 +264,10 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
     const inviteTeam = () => {
         listUserByTeam.forEach(e => {
             axios.post(ROOT_API + API_WORKSPACE_USER + '/' + query.get("id") + '/' + e).then(res => {
-                openNotificationWithIcon('success', 'Invite member success');
+                openNotificationWithIcon('success', 'Mời thành viên thành công');
                 setVisibleModalInvite(false);
             }).catch(err => {
-                openNotificationWithIcon('success', 'Invite member fail');
+                openNotificationWithIcon('success', 'Có lỗi xảy ra');
             });
             axios.post(ROOT_API + API_SEND_MAIL, {
                 managerName: JSON.parse(window.localStorage.getItem('auth_user')).username,
@@ -335,7 +337,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                             />
                         </Tooltip>
                         <Tooltip
-                            title={'Thay đổi'}
+                            title={'Cập nhật'}
                         >
                             <EditOutlined
                                 className="icon_action"
@@ -433,7 +435,7 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                         //     type="primary"
                         //     onClick={openFormWorkspace}
                         // >Create</Button>,
-                        <Button type="primary" onClick={editWorkspace}>Thay đổi</Button>,
+                        <Button type="primary" onClick={editWorkspace}>Cập nhật</Button>,
                         <Button type="primary" onClick={deleteWorkspace}>Xóa</Button>
                     ] : [
                         <Button type="danger" onClick={leaveWorkspace}>Rời không gian</Button>
@@ -497,11 +499,11 @@ const Home = (props, { getOwnWorkspace, getListWorkspace }) => {
                             title={
                                 <Row>
                                     <Col span={20}></Col>
-                                    <Col span={4} style={{ textAlign: 'right' }}>
+                                    {/* <Col span={4} style={{ textAlign: 'right' }}>
                                         {query.get('type') == 'manager' &&
                                             <Button type='primary' >Invite</Button>
                                         }
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                             }
                         >

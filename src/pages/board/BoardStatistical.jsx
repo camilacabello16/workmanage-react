@@ -98,7 +98,7 @@ const BoardStatistical = ({ currentBoardID, activeKey }) => {
             }}
         >
             <div>
-                <p style={{ fontSize: 20 }}>Thống kê số task của từng list</p>
+                <p style={{ fontSize: 20 }}>Thống kê số công việc của từng danh sách</p>
                 <PieChart width={500} height={400}>
                     <Pie
                         dataKey="value"
@@ -118,7 +118,7 @@ const BoardStatistical = ({ currentBoardID, activeKey }) => {
                 </PieChart>
             </div>
             <div>
-                <p style={{ fontSize: 20 }}>Thống kê số task theo người làm</p>
+                <p style={{ fontSize: 20 }}>Thống kê số công việc theo người làm</p>
                 <PieChart width={500} height={400}>
                     <Pie
                         dataKey="value"

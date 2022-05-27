@@ -51,13 +51,13 @@ const FormBoard = ({ visible, setVisibleBoardModal, getWorkspaceDetail, parentId
         if (currentBoard.id) {
             values.id = currentBoard.id;
             axios.put(ROOT_API + API_WORKSPACE + '/' + currentBoard.id, values).then(res => {
-                openNotificationWithIcon('success', 'Create success');
+                openNotificationWithIcon('success', 'Tạo bảng thành công');
                 setVisibleBoardModal(false);
                 getWorkspaceDetail();
             })
         } else {
             axios.post(ROOT_API + API_WORKSPACE, values).then(res => {
-                openNotificationWithIcon('success', 'Create success');
+                openNotificationWithIcon('success', 'Có lỗi xảy ra');
                 setVisibleBoardModal(false);
                 getWorkspaceDetail();
             })
@@ -103,8 +103,8 @@ const FormBoard = ({ visible, setVisibleBoardModal, getWorkspaceDetail, parentId
                     <Select
                         placeholder=""
                     >
-                        <Option key={1} value={1}>Private</Option>
-                        <Option key={2} value={2}>Public</Option>
+                        <Option key={1} value={1}>Riêng tư</Option>
+                        <Option key={2} value={2}>Cá nhân</Option>
                     </Select>
                 </Form.Item>
                 <Row
@@ -113,8 +113,8 @@ const FormBoard = ({ visible, setVisibleBoardModal, getWorkspaceDetail, parentId
                         justifyContent: "end"
                     }}
                 >
-                    <Button onClick={() => setVisibleBoardModal(false)}>Cancel</Button>
-                    <Button type="primary" htmlType="submit" style={{ marginLeft: 10 }}>Submit</Button>
+                    <Button onClick={() => setVisibleBoardModal(false)}>Hủy</Button>
+                    <Button type="primary" htmlType="submit" style={{ marginLeft: 10 }}>Lưu</Button>
                 </Row>
 
             </Form>

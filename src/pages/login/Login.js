@@ -40,7 +40,7 @@ const Login = () => {
             setSession(response.data.access_token);
         }).catch(err => {
             console.log(err);
-            openNotificationWithIcon("error", "Username or password wrong");
+            openNotificationWithIcon("error", "Tên đăng nhập hoặc mật khẩu không đúng");
         });
         //alert('Here')
         await getCurrentUser().then(res => {
@@ -51,7 +51,7 @@ const Login = () => {
         // await getAllMenuItemByRoleList().then(res => {
         //window.localStorage.setSessionItem("navigations",res.data);
         //window.localStorage.setLocalStorageItem("navigations", res.data);
-        openNotificationWithIcon("success", "Login success");
+        openNotificationWithIcon("success", "Đăng nhập thành công");
         window.location.href = "/";
         // });
 

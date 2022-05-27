@@ -13,11 +13,13 @@ import {
     Tabs,
     Dropdown,
     Menu,
-    Select
+    Select,
+    Typography,
+    Divider
 } from 'antd';
 import React, { useState, useMemo, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined, EyeOutlined, PicRightOutlined, UnorderedListOutlined, WechatOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import {
     ROOT_API,
     API_CARD,
@@ -29,7 +31,8 @@ import {
     API_TEMPLATE,
     API_TEMPLATE_SEARCH,
     API_TEMPLATE_CLONE,
-    API_USER
+    API_USER,
+    API_COMMENT
 } from '../../components/constant/api';
 import axios from 'axios';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -51,6 +54,7 @@ const BoardDetail = () => {
     const [formCard] = Form.useForm();
     const [formTemplate] = Form.useForm();
     const [formCloneTemplate] = Form.useForm();
+    const [formComment] = Form.useForm();
 
     const [listCard, setListCard] = useState([
         {
@@ -137,6 +141,14 @@ const BoardDetail = () => {
     const [keyTab, setKeyTab] = useState('');
     const [listUser, setListUser] = useState([]);
     const [userId, setUserId] = useState(null);
+    const [visibleDetail, setVisibleDetail] = useState(false);
+    const [taskDetailName, setTaskDetailName] = useState('');
+    const [cardName, setCardName] = useState('');
+    const [commentContent, setCommentContent] = useState('');
+    const [taskDetailId, setTaskDetailId] = useState('');
+    const [listComment, setListComment] = useState([]);
+    const [taskDetailStartTime, setTaskDetailStartTime] = useState(null);
+    const [taskDetailEndTime, setTaskDetailEndTime] = useState(null);
 
     const getBoardDetail = () => {
         axios.get(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
@@ -152,6 +164,11 @@ const BoardDetail = () => {
         axios.get(ROOT_API + API_USER + '/1/1000', { headers: { "Authorization": `Bearer ${window.localStorage.getItem('jwt_token')}` } }).then(res => {
             setListUser(res.data.content);
         })
+    }
+
+    const msToTime = (time) => {
+        var date = new Date(time);
+        return date;
     }
 
     useEffect(() => {
@@ -294,6 +311,11 @@ const BoardDetail = () => {
         setVisibleTask(true);
     }
 
+    const onCloseDetailTask = () => {
+        setVisibleDetail(false);
+        setCommentContent('');
+    }
+
     const onCloseTask = () => {
         setVisibleTask(false);
         formTask.resetFields();
@@ -323,11 +345,11 @@ const BoardDetail = () => {
             axios.post(ROOT_API + API_TASK, value).then(res => {
                 getTask();
                 getCard();
-                openNotificationWithIcon('success', 'Insert task success');
+                openNotificationWithIcon('success', 'Thêm thẻ thành công');
                 onCloseTask();
                 formTask.resetFields();
             }).catch(err => {
-                openNotificationWithIcon('error', 'Insert task fail');
+                openNotificationWithIcon('error', 'Có lỗi xảy ra');
             })
         }
         else {
@@ -337,11 +359,11 @@ const BoardDetail = () => {
             }
             axios.put(ROOT_API + API_TASK + '/' + taskItemEdit.id, value).then(res => {
                 getTask();
-                openNotificationWithIcon('success', 'Update task success');
+                openNotificationWithIcon('success', 'Cập nhật thẻ thành công');
                 onCloseTask();
                 formTask.resetFields();
             }).catch(err => {
-                openNotificationWithIcon('error', 'Update task fail');
+                openNotificationWithIcon('error', 'Có lỗi xảy ra');
             })
         }
 
@@ -356,12 +378,12 @@ const BoardDetail = () => {
             value.viewIndex = listCard.length;
             axios.post(ROOT_API + API_CARD, value).then(res => {
                 getCard();
-                openNotificationWithIcon('success', 'Insert card success');
+                openNotificationWithIcon('success', 'Thêm danh sách thành công');
                 onCloseCard();
                 formCard.resetFields();
                 formTask.resetFields();
             }).catch(err => {
-                openNotificationWithIcon('error', 'Insert card fail');
+                openNotificationWithIcon('error', 'Có lỗi xảy ra');
             })
         }
         else {
@@ -369,12 +391,12 @@ const BoardDetail = () => {
             value.viewIndex = cardItemEdit.viewIndex;
             axios.put(ROOT_API + API_CARD + '/' + cardItemEdit.id, value).then(res => {
                 getCard();
-                openNotificationWithIcon('success', 'Update card success');
+                openNotificationWithIcon('success', 'Cập nhật danh sách thành công');
                 onCloseCard();
                 formCard.resetFields();
                 formTask.resetFields();
             }).catch(err => {
-                openNotificationWithIcon('error', 'Update card fail');
+                openNotificationWithIcon('error', 'Có lỗi xảy ra');
             })
         }
     }
@@ -390,17 +412,17 @@ const BoardDetail = () => {
 
     const deleteTask = (id) => {
         Modal.confirm({
-            title: "Do you want remove this task?",
-            okText: "Yes",
+            title: "Bạn có muốn xóa thẻ này?",
+            okText: "Đồng ý",
             okType: "danger",
-            cancelText: "Cancel",
+            cancelText: "Hủy",
             onOk() {
                 axios.delete(ROOT_API + API_TASK + '/' + id).then(res => {
                     console.log(res);
                     getTask();
-                    openNotificationWithIcon('success', 'Delete task success');
+                    openNotificationWithIcon('success', 'Xóa thẻ thành công');
                 }).catch(err => {
-                    openNotificationWithIcon('error', 'Delete task fail');
+                    openNotificationWithIcon('error', 'Có lỗi xảy ra');
                 })
             },
             onCancel() { },
@@ -409,16 +431,16 @@ const BoardDetail = () => {
 
     const deleteBoard = () => {
         Modal.confirm({
-            title: "Do you want remove this board?",
-            okText: "Yes",
+            title: "Bạn có muốn xóa bảng này?",
+            okText: "Đồng ý",
             okType: "danger",
-            cancelText: "Cancel",
+            cancelText: "Hủy",
             onOk() {
                 axios.delete(ROOT_API + API_WORKSPACE + '/' + query.get("id")).then(res => {
-                    openNotificationWithIcon('success', 'Delete board success');
+                    openNotificationWithIcon('success', 'Xóa bảng thành công');
                     history.push('/');
                 }).catch(err => {
-                    openNotificationWithIcon('error', 'Delete board fail');
+                    openNotificationWithIcon('error', 'Có lỗi xảy ra');
                 })
             },
             onCancel() { },
@@ -431,16 +453,16 @@ const BoardDetail = () => {
 
     const deleteCard = (id) => {
         Modal.confirm({
-            title: "Do you want remove this card?",
-            okText: "Yes",
+            title: "Bạn có muốn xóa danh sách này?",
+            okText: "Đồng ý",
             okType: "danger",
-            cancelText: "Cancel",
+            cancelText: "Hủy",
             onOk() {
                 axios.delete(ROOT_API + API_CARD + '/' + id).then(res => {
-                    openNotificationWithIcon('success', 'Delete card success');
+                    openNotificationWithIcon('success', 'Xóa danh sách thành công');
                     getCard();
                 }).catch(err => {
-                    openNotificationWithIcon('error', 'Delete card fail');
+                    openNotificationWithIcon('error', 'Có lỗi xảy ra');
                 })
             },
             onCancel() { },
@@ -477,14 +499,14 @@ const BoardDetail = () => {
         boardClone.user_id = JSON.parse(window.localStorage.getItem('auth_user')).id;
         console.log(boardClone);
         axios.post(ROOT_API + API_TEMPLATE, boardClone).then(res => {
-            openNotificationWithIcon('success', 'Create template success');
+            openNotificationWithIcon('success', 'Tạo mẫu thành công');
             onCloseTemplate();
             getCard();
             getTask();
             getListTemplate();
             formTemplate.resetFields();
         }).catch(err => {
-            openNotificationWithIcon('error', 'Create template fail');
+            openNotificationWithIcon('error', 'Có lỗi xảy ra');
         })
     }
 
@@ -501,18 +523,70 @@ const BoardDetail = () => {
         }
         console.log(cloneObj);
         axios.post(ROOT_API + API_TEMPLATE_CLONE, cloneObj).then(res => {
-            openNotificationWithIcon('success', 'Create board from template success');
-            history.push('/board?id=' + res.data.id);
+            openNotificationWithIcon('success', 'Tạo bảng từ mẫu thành công');
+            history.push('/board?id=' + res.data.id + '&type=manager');
             getBoardDetail();
             getCard();
             getTask();
         }).catch(err => {
-            openNotificationWithIcon('success', 'Create board from template fail');
+            openNotificationWithIcon('success', 'Có lỗi xảy ra');
         })
     }
 
     const onCloneTemplate = (value) => {
 
+    }
+
+    const getComment = (taskId) => {
+        axios.post(ROOT_API + API_COMMENT + '/search', {
+            pageIndex: 0,
+            pageSize: 10,
+            taskId: taskId
+        }).then(res => {
+            setListComment(res.data.content);
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
+    const openDetailTask = (item) => {
+        setTaskDetailName(item.name);
+        setTaskDetailId(item.id);
+        setTaskDetailStartTime(item.startDate);
+        setTaskDetailEndTime(item.endDate);
+        getComment(item.id);
+        setVisibleDetail(true);
+    }
+
+    const addComment = () => {
+        let object = {
+            content: commentContent,
+            user: {
+                id: JSON.parse(window.localStorage.getItem('auth_user')).id
+            },
+            task: {
+                id: taskDetailId
+            }
+        }
+        axios.post(ROOT_API + API_COMMENT, object).then(res => {
+            getComment(taskDetailId);
+        });
+        setCommentContent('');
+    }
+
+    const deleteComment = (id) => {
+        Modal.confirm({
+            title: "Bạn có muốn xóa bình luận?",
+            okText: "Đồng ý",
+            okType: "danger",
+            cancelText: "Hủy",
+            onOk() {
+                axios.delete(ROOT_API + API_COMMENT + '/' + id).then(res => {
+                    getComment(taskDetailId);
+                })
+            },
+            onCancel() { },
+        });
     }
 
     return (
@@ -531,30 +605,34 @@ const BoardDetail = () => {
 
                                 <Col span={6}></Col>
                                 <Col span={12} style={{ textAlign: 'right' }}>
-                                    <Button onClick={() => history.push('/workspace?id=' + boardParentId + '&type=' + query.get("type"))} style={{ marginRight: 10 }}>Back</Button>
+                                    <Button onClick={() => history.push('/workspace?id=' + boardParentId + '&type=' + query.get("type"))} style={{ marginRight: 10 }}>Quay lại</Button>
                                     {/* <Button>Invite</Button> */}
-                                    <Button type='primary' style={{ marginLeft: 10 }} onClick={() => setVisibleFormBoard(true)}>Edit</Button>
-                                    <Button type='primary' style={{ marginLeft: 10 }} onClick={deleteBoard}>Delete</Button>
-                                    <Button type='primary' style={{ marginLeft: 10 }} onClick={createTemplate}>Create Template</Button>
-                                    <Select
-                                        showSearch
-                                        filterOption="children"
-                                        style={{ marginLeft: 10, width: '25%' }}
-                                        placeholder="Choose template"
-                                        onChange={(e) => cloneTemplate(e)}
-                                    >
-                                        {listTemplate.map((item, index) => {
-                                            return (
-                                                <Select.Option key={index} value={item.id}>{item.name}</Select.Option>
-                                            );
-                                        })}
-                                    </Select>
+                                    <Button type='primary' style={{ marginLeft: 10 }} onClick={() => setVisibleFormBoard(true)}>Sửa</Button>
+                                    <Button type='primary' style={{ marginLeft: 10 }} onClick={deleteBoard}>Xóa</Button>
+                                    {query.get("type") == 'manager' &&
+                                        <Button type='primary' style={{ marginLeft: 10 }} onClick={createTemplate}>Tạo mẫu</Button>
+                                    }
+                                    {query.get("type") == 'manager' &&
+                                        <Select
+                                            showSearch
+                                            filterOption="children"
+                                            style={{ marginLeft: 10, width: '25%' }}
+                                            placeholder="Chọn mẫu"
+                                            onChange={(e) => cloneTemplate(e)}
+                                        >
+                                            {listTemplate.map((item, index) => {
+                                                return (
+                                                    <Select.Option key={index} value={item.id}>{item.name}</Select.Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    }
                                 </Col>
                             </Row>
                         }
                     >
                         <Tabs defaultActiveKey="1" onChange={callback}>
-                            <TabPane tab="Board" key="1">
+                            <TabPane tab="Bảng" key="1">
                                 <div>
                                     <Row>
                                         <Col span={6}>
@@ -575,7 +653,7 @@ const BoardDetail = () => {
                                         </Col>
                                     </Row>
                                     <div
-                                        style={{ display: 'flex', marginTop: 10 }}
+                                        style={{ display: 'flex', marginTop: 10, overflowX: 'scroll', paddingBottom: 10 }}
                                     >
                                         <DragDropContext
                                             onDragEnd={result => onDragEnd(result)}
@@ -613,8 +691,8 @@ const BoardDetail = () => {
                                                                                     trigger={['click']}
                                                                                     overlay={
                                                                                         <Menu>
-                                                                                            <Menu.Item key="1" onClick={() => editCard(item)}>Edit</Menu.Item>
-                                                                                            <Menu.Item key="2" onClick={() => deleteCard(item.id)}>Delete</Menu.Item>
+                                                                                            <Menu.Item key="1" onClick={() => editCard(item)}>Sửa</Menu.Item>
+                                                                                            <Menu.Item key="2" onClick={() => deleteCard(item.id)}>Xóa</Menu.Item>
                                                                                         </Menu>
                                                                                     }
                                                                                 >
@@ -624,6 +702,8 @@ const BoardDetail = () => {
                                                                             <div
                                                                                 style={{
                                                                                     marginRight: 10,
+                                                                                    maxHeight: 400,
+                                                                                    overflowY: 'scroll'
                                                                                 }}
                                                                             >
                                                                                 <Droppable droppableId={item.id}>
@@ -684,15 +764,26 @@ const BoardDetail = () => {
                                                                                                                                         <span
                                                                                                                                             {...provided2.dragHandleProps}
                                                                                                                                             style={{
-                                                                                                                                                width: '100%'
+                                                                                                                                                width: '100%',
+                                                                                                                                                fontSize: 16,
+                                                                                                                                                fontWeight: 600
                                                                                                                                             }}
                                                                                                                                         >{item2.name}</span>
                                                                                                                                         <span>
-                                                                                                                                            Assign: {item2.user?.username}
+                                                                                                                                            Giao cho: {item2.user?.username}
                                                                                                                                         </span>
                                                                                                                                     </div>
                                                                                                                                     <div>
-                                                                                                                                        <Tooltip title="Edit">
+                                                                                                                                        <Tooltip title="Chi tiết">
+                                                                                                                                            <EyeOutlined
+                                                                                                                                                style={{
+                                                                                                                                                    cursor: 'pointer',
+                                                                                                                                                    marginRight: 5
+                                                                                                                                                }}
+                                                                                                                                                onClick={() => openDetailTask(item2)}
+                                                                                                                                            />
+                                                                                                                                        </Tooltip>
+                                                                                                                                        <Tooltip title="Sửa">
                                                                                                                                             <EditOutlined
                                                                                                                                                 style={{
                                                                                                                                                     cursor: 'pointer'
@@ -700,11 +791,11 @@ const BoardDetail = () => {
                                                                                                                                                 onClick={() => editTask(item2)}
                                                                                                                                             />
                                                                                                                                         </Tooltip>
-                                                                                                                                        <Tooltip title="Delete">
+                                                                                                                                        <Tooltip title="Xóa">
                                                                                                                                             <DeleteOutlined
                                                                                                                                                 style={{
                                                                                                                                                     cursor: 'pointer',
-                                                                                                                                                    marginLeft: 10
+                                                                                                                                                    marginLeft: 5
                                                                                                                                                 }}
                                                                                                                                                 onClick={() => deleteTask(item2.id)}
                                                                                                                                             />
@@ -732,7 +823,7 @@ const BoardDetail = () => {
                                                                                                     className='button-icon'
                                                                                                     icon={<PlusOutlined></PlusOutlined>}
                                                                                                     onClick={() => { insertTask(item.id); setIsEditTask(false); }}
-                                                                                                >Add a card</Button>
+                                                                                                >Thêm thẻ</Button>
                                                                                             </div>
                                                                                         );
                                                                                     }}
@@ -749,11 +840,11 @@ const BoardDetail = () => {
                                                 )}
                                             </Droppable>
                                         </DragDropContext>
-                                        <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => { setVisibleCard(true); setIsEditCard(false); }}>Add another list</Button>
+                                        <Button className='button-icon' icon={<PlusOutlined></PlusOutlined>} type="primary" onClick={() => { setVisibleCard(true); setIsEditCard(false); }}>Thêm danh sách</Button>
                                     </div>
                                 </div>
                             </TabPane>
-                            <TabPane tab="Statistical" key="2">
+                            <TabPane tab="Thống kê" key="2">
                                 <BoardStatistical
                                     currentBoardID={boardDetail.id}
                                     activeKey={keyTab}
@@ -765,7 +856,7 @@ const BoardDetail = () => {
 
             </div>
             <Modal
-                title="Add Task"
+                title="Cập nhật công việc"
                 visible={visibleAddTask}
                 onCancel={onCloseTask}
                 footer={null}
@@ -779,11 +870,11 @@ const BoardDetail = () => {
                         <Col span={24}>
                             <Form.Item
                                 name="name"
-                                label="Name"
+                                label="Tên"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please enter task name'
+                                        message: 'Vui lòng nhập tên công việc'
                                     }
                                 ]}
                             >
@@ -793,7 +884,7 @@ const BoardDetail = () => {
                         <Col span={12}>
                             <Form.Item
                                 name="startDate"
-                                label="Start Date"
+                                label="Ngày bắt đầu"
                             >
                                 <DatePicker
                                     style={{ width: '98%' }}
@@ -807,7 +898,7 @@ const BoardDetail = () => {
                         <Col span={12}>
                             <Form.Item
                                 name="endDate"
-                                label="End Date"
+                                label="Ngày kết thúc"
                             >
                                 <DatePicker
                                     style={{ width: '100%' }}
@@ -821,7 +912,7 @@ const BoardDetail = () => {
                         <Col span={24}>
                             <Form.Item
                                 name="user"
-                                label="Assign"
+                                label="Giao cho"
                                 rules={[
                                     {
                                         required: true,
@@ -847,7 +938,7 @@ const BoardDetail = () => {
                 </Form>
             </Modal>
             <Modal
-                title="Add Card"
+                title="Danh sách"
                 visible={visibleAddCard}
                 onCancel={onCloseCard}
                 footer={null}
@@ -861,11 +952,11 @@ const BoardDetail = () => {
                         <Col span={24}>
                             <Form.Item
                                 name="name"
-                                label="Name"
+                                label="Tên"
                                 rules={[
                                     {
                                         required: true,
-                                        message: 'Please enter task name'
+                                        message: 'Vui lòng nhập tên danh sách'
                                     }
                                 ]}
                             >
@@ -874,14 +965,14 @@ const BoardDetail = () => {
                         </Col>
                         <Col span={24}>
                             <Form.Item>
-                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Submit</Button>
+                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Lưu</Button>
                             </Form.Item>
                         </Col>
                     </Row>
                 </Form>
             </Modal>
             <Modal
-                title="Create Template"
+                title="Tạo mẫu"
                 visible={visibleAddTemplate}
                 onCancel={onCloseTemplate}
                 footer={null}
@@ -895,7 +986,7 @@ const BoardDetail = () => {
                         <Col span={24}>
                             <Form.Item
                                 name="name"
-                                label="Name"
+                                label="Tên"
                                 rules={[
                                     {
                                         required: true,
@@ -908,7 +999,7 @@ const BoardDetail = () => {
                         </Col>
                         <Col span={24}>
                             <Form.Item>
-                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Submit</Button>
+                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Lưu</Button>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -940,7 +1031,7 @@ const BoardDetail = () => {
                         <Col span={24}>
                             <Form.Item
                                 name="name"
-                                label="Name"
+                                label="Tên"
                                 rules={[
                                     {
                                         required: true,
@@ -953,9 +1044,122 @@ const BoardDetail = () => {
                         </Col>
                         <Col span={24}>
                             <Form.Item>
-                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Submit</Button>
+                                <Button type='primary' htmlType='submit' style={{ width: '100%' }}>Lưu</Button>
                             </Form.Item>
                         </Col>
+                    </Row>
+                </Form>
+            </Modal>
+            <Modal
+                title="Chi tiết công việc"
+                visible={visibleDetail}
+                onCancel={onCloseDetailTask}
+                footer={null}
+                width={600}
+            >
+                <Form
+                    layout="vertical"
+                    form={formComment}
+                >
+                    <Row >
+                        <Col span={2}>
+                            <PicRightOutlined
+                                style={{
+                                    fontSize: 20
+                                }}
+                            />
+                        </Col>
+                        <Col span={20}>
+                            <Typography.Title level={4}>{taskDetailName}</Typography.Title>
+                        </Col>
+                    </Row>
+                    {/* {taskDetailStartTime || taskDetailEndTime && */}
+                    <Row style={{
+                        paddingTop: 5,
+                        paddingBottom: 15,
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}>
+                        <Col span={2}>
+                            <ClockCircleOutlined
+                                style={{
+                                    fontSize: 20
+                                }}
+                            />
+                        </Col>
+                        <Col span={20}>
+                            <div>Từ {moment(msToTime(taskDetailStartTime)).format("DD/MM/YYYY")} đến {moment(msToTime(taskDetailEndTime)).format("DD/MM/YYYY")}</div>
+                        </Col>
+                    </Row>
+                    {/* } */}
+                    <Row>
+                        <Col span={2}>
+                            <WechatOutlined
+                                style={{
+                                    fontSize: 20
+                                }}
+                            />
+                        </Col>
+                        <Col span={20}>
+                            <Typography.Title level={4}>Thảo luận</Typography.Title>
+                            <div style={{ marginBottom: 10, display: 'flex' }}>
+                                <div
+                                    style={{
+                                        width: 30,
+                                        height: 30,
+                                        marginRight: 10
+                                    }}
+                                >
+                                    <img style={{ width: '100%', height: '100%' }} src='https://crm-v2-dev.247post.vn/images/avatar.png' />
+                                </div>
+                                <Input.TextArea value={commentContent} onChange={(e) => setCommentContent(e.target.value)} />
+                            </div>
+                            <Button type='primary' onClick={addComment} disabled={commentContent == '' ? true : false}>Lưu</Button>
+                        </Col>
+                    </Row>
+                    <Divider />
+                    <Row style={{ paddingLeft: 40, maxHeight: 220, overflowY: 'scroll' }}>
+                        {listComment.map((item, index) => {
+                            return (
+                                <Col span={24} style={{ marginBottom: 10, display: 'flex' }} key={index}>
+                                    <div
+                                        style={{
+                                            width: 30,
+                                            height: 30,
+                                            marginRight: 10
+                                        }}
+                                    >
+                                        <img style={{ width: '100%', height: '100%' }} src='https://crm-v2-dev.247post.vn/images/avatar.png' />
+                                    </div>
+                                    <div style={{ width: '100%', flex: 1 }}>
+                                        <span style={{ fontWeight: 'bold', fontSize: 16, marginRight: 10 }}>{listUser.find(o => o.id == item.user.id)?.username}</span>
+                                        <span>{item.createDate[2]}/{item.createDate[1]}/{item.createDate[0]} {item.createDate[3]}:{item.createDate[4]}:{item.createDate[5]}</span>
+                                        <div
+                                            style={{
+                                                boxShadow: '0 1px 2px -1px #091e4240, 0 0 0 1px #091e4214',
+                                                padding: 5,
+                                                borderRadius: 3,
+                                                width: '90%',
+                                                marginTop: 5
+                                            }}
+                                        >
+                                            {item.content}
+                                        </div>
+                                        {/* <Tooltip title="Xóa">
+                                            <DeleteOutlined />
+                                        </Tooltip> */}
+                                    </div>
+                                    <div style={{ marginTop: 40, marginRight: 50 }}>
+                                        <Tooltip title="Xóa">
+                                            <DeleteOutlined
+                                                className='button-icon'
+                                                onClick={() => deleteComment(item.id)}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                </Col>
+                            );
+                        })}
                     </Row>
                 </Form>
             </Modal>

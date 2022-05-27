@@ -26,7 +26,7 @@ const LeftMenuLayout = ({ listWorkspaceOwn }) => {
 
     const getWorkspace = () => {
         axios.post(ROOT_API + API_WORKSPACE_USER_SEARCH, {
-            userId: JSON.parse(window.localStorage.getItem('auth_user')).id,
+            userId: JSON.parse(window.localStorage.getItem('auth_user'))?.id,
             role: "ROLE_WORKSPACE_USER",
             pageIndex: 0,
             pageSize: 100

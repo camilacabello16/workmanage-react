@@ -37,7 +37,7 @@ const Registration = () => {
             }
         }).catch(err => {
             console.log(err);
-            openNotificationWithIcon("error", "Lỗi hệ thống(email)");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         });
     };
     const onCheckUserName = async (values) => {
@@ -52,7 +52,7 @@ const Registration = () => {
             }
         }).catch(err => {
             console.log(err);
-            openNotificationWithIcon("error", "Lỗi hệ thống(username)");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         });
     };
     const onFinish = (values) => {
@@ -77,7 +77,7 @@ const Registration = () => {
             openNotificationWithIcon("success", "Đăng kí thành công. Đăng nhập để tiếp tục!");
         }).catch(err => {
             console.log(err);
-            openNotificationWithIcon("error", "Lỗi hệ thống(aaaaaaa)");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         });
     };
 
@@ -96,7 +96,7 @@ const Registration = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    paddingTop: 80
+                    paddingTop: 15
                 }}
             >
                 <div
@@ -127,11 +127,11 @@ const Registration = () => {
                         }}
                     >Joinco</span>
                 </div>
-                <p
+                {/* <p
                     style={{
                         fontSize: 20
                     }}
-                >Welcome to joinco.com</p>
+                >Chào mừng đến với Joinco</p> */}
             </Space>
             <Card
                 style={{

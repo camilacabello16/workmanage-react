@@ -32,7 +32,7 @@ const ProfileManage = () => {
     useEffect(() => {
         userJSON = window.localStorage.getItem('auth_user');
         if (userJSON && userJSON != '') {
-            openNotificationWithIcon("success", "Lỗi hệ thống('')");
+            openNotificationWithIcon("success", "Có lỗi xảy ra");
             form.setFieldsValue({
                 displayName: JSON.parse(userJSON).displayName,
                 email: JSON.parse(userJSON).email,
@@ -40,7 +40,7 @@ const ProfileManage = () => {
             })
             getData();
         } else {
-            openNotificationWithIcon("error", "Lỗi hệ thống('')");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         }
     }, [])
     const getData = () => {
@@ -78,7 +78,7 @@ const ProfileManage = () => {
             console.log(object);
         }).catch(err => {
             console.log(err);
-            openNotificationWithIcon("error", "Lỗi hệ thống(displayName)");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         });
     };
     const onFinishTab2 = async (values) => {
@@ -90,7 +90,7 @@ const ProfileManage = () => {
             console.log(object);
         }).catch(err => {
             console.log(err);
-            openNotificationWithIcon("error", "Lỗi hệ thống(Email)");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         });
     };
     const onFinishTab3 = async (values) => {
@@ -104,7 +104,7 @@ const ProfileManage = () => {
         }).catch(err => {
             console.log(err);
             console.log(object);
-            openNotificationWithIcon("error", "Lỗi hệ thống(password)");
+            openNotificationWithIcon("error", "Có lỗi xảy ra");
         });
     };
 

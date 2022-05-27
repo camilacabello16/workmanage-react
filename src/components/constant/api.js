@@ -52,3 +52,6 @@ export const API_TEAM_SEARCH = '/team/search';
 //send mail
 export const API_SEND_MAIL = '/send-email';
 
+//comment
+export const API_COMMENT = '/comment';
+

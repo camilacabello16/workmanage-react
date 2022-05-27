@@ -31,6 +31,7 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
     const [isInsert, setIsInsert] = useState(true);
     const [listNotification, setListNotification] = useState([]);
     const [listWorkspace, setListWorkspace] = useState([]);
+    let userDetail = JSON.parse(window.localStorage.getItem('auth_user'));
 
     const history = useHistory();
 
@@ -110,8 +111,8 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                     </div>
                 </Col>
                 <Col span={18}>
-                    <span>userK</span>
-                    <p style={{ marginBottom: 0 }}>hieu@gmail.com</p>
+                    <span>{userDetail?.username}</span>
+                    <p style={{ marginBottom: 0 }}>{userDetail?.email}</p>
                 </Col>
             </Row>
             <Menu.Item onClick={profile}>
@@ -139,12 +140,12 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
     const acceptInvite = (workspaceId, notiId) => {
         axios.put(ROOT_API + API_WORKSPACE_USER + '/invite/' + workspaceId + '/' + true).then(res => {
             console.log(res);
-            openNotificationWithIcon('success', 'Join Workspace success');
+            openNotificationWithIcon('success', 'Đã vào không gian làm việc');
             deleteNoti(notiId);
             getListWorkspace();
             getNotification();
         }).catch(err => {
-            openNotificationWithIcon('error', 'Join Workspace fail');
+            openNotificationWithIcon('error', 'Có lỗi xảy ra');
         })
     }
 
@@ -163,7 +164,7 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                                         fontSize: 20,
                                         color: '#17A589'
                                     }}
-                                    onClick={() => { acceptInvite(item.notificationDto.workspaceId, item.id) }}
+                                    onClick={() => { acceptInvite(item.notificationDto.workspaceId, item?.id) }}
                                 />
                             </Tooltip>
                             <Tooltip title="Từ chối">
@@ -208,7 +209,7 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                         >
                             {listWorkspace.map((item, index) => {
                                 return (
-                                    <Select.Option value={item.id} key={index}>
+                                    <Select.Option value={item?.id} key={index}>
                                         {item.name}
                                     </Select.Option>
                                 );
@@ -249,7 +250,7 @@ const MenuLayout = ({ getOwnWorkspace, getListWorkspace }) => {
                                             marginTop: 20,
                                             marginLeft: 9
                                         }}
-                                    >1</div>
+                                    >{listNotification.length}</div>
                                 }
                             </div>
                         </Dropdown>
